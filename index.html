@@ -1,0 +1,1807 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DRAGONBALL VISUAL ADVENTURE — 卡牌圖鑑</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', 'Noto Sans TC', sans-serif;
+      background-color: #061830;
+      background-image:
+        radial-gradient(circle at 18% 12%, rgba(24, 90, 168, 0.42) 0%, transparent 45%),
+        radial-gradient(circle at 82% 24%, rgba(14, 62, 128, 0.38) 0%, transparent 50%),
+        radial-gradient(circle at 50% 80%, rgba(18, 76, 152, 0.32) 0%, transparent 55%),
+        repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.015) 0px, rgba(255, 255, 255, 0.015) 2px, transparent 2px, transparent 10px);
+    }
+
+    /* Premium Set Vol.1 標題赤紅到金黃漸層 */
+    .dbva-title-gradient {
+      background: linear-gradient(180deg, #FFF275 0%, #FFD026 42%, #F97316 68%, #DC2626 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 3px 0 #111827) drop-shadow(0 0 14px rgba(250, 204, 21, 0.35));
+    }
+
+    /* 海報底部的粗白黑描邊日文字樣 */
+    .dbva-poster-jp-text {
+      color: #FFFFFF;
+      -webkit-text-stroke: 1.5px #090D16;
+      paint-order: stroke fill;
+      text-shadow: 0 3px 0 #090D16, 0 0 12px rgba(255, 255, 255, 0.25);
+    }
+
+    /* 黑色描邊片假名副標膠囊 */
+    .dbva-katakana-pill {
+      background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%);
+      box-shadow: 0 3px 0 #020617, 0 0 12px rgba(250, 204, 21, 0.25);
+    }
+
+    /* 海報底部二星龍珠膠囊橫幅 */
+    .dbva-dragonball-banner {
+      background: linear-gradient(90deg, #C81E1E 0%, #EA580C 38%, #FACC15 76%, #EAB308 100%);
+      box-shadow: 0 4px 0 #090D16, 0 12px 26px rgba(0, 0, 0, 0.65);
+    }
+
+    /* 閃卡折射光澤動畫 */
+    .prism-sheen::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        125deg,
+        rgba(255, 255, 255, 0) 25%,
+        rgba(255, 245, 180, 0.28) 45%,
+        rgba(125, 211, 252, 0.22) 55%,
+        rgba(255, 255, 255, 0) 75%
+      );
+      pointer-events: none;
+      opacity: 0.75;
+    }
+
+    /* 卡片金框懸停微浮效果 */
+    .dbva-card {
+      transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.24s ease;
+    }
+    .dbva-card:hover {
+      transform: translateY(-6px) scale(1.015);
+      box-shadow: 0 18px 34px -8px rgba(0, 0, 0, 0.72), 0 0 0 2px rgba(250, 204, 21, 0.75);
+    }
+
+    /* 自訂捲軸 */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #051326;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e4976;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #f59e0b;
+    }
+  </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col selection:bg-amber-400 selection:text-slate-950">
+
+  <!-- 頂部 Premium Set Vol.1 風格橫幅 -->
+  <header class="relative border-b-2 border-amber-300/70 bg-gradient-to-b from-[#042449]/95 via-[#073b73]/85 to-[#03264d]/95 shadow-2xl overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-6">
+      <!-- 頂端狀態與快取工具列 -->
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4 text-xs">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-950/75 border border-amber-400/40 text-amber-200 shadow">
+          <span id="cacheStatusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="cacheStatusText">資料狀態：初始化中...</span>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button
+            id="refreshApiBtn"
+            type="button"
+            class="px-3.5 py-1.5 rounded-full bg-amber-500/20 hover:bg-amber-500/35 border border-amber-400/60 text-amber-200 font-semibold transition cursor-pointer flex items-center gap-1.5"
+            title="忽略本地快取並重新向開源 API 取得最新資料"
+          >
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>強制更新快取</span>
+          </button>
+
+          <a
+            href="https://fchavonet.github.io/full_stack-db_visual_adventure_cards-api/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="px-3.5 py-1.5 rounded-full bg-sky-950/80 hover:bg-sky-900/90 border border-sky-400/40 text-sky-200 font-medium transition"
+          >
+            API 文件 ↗
+          </a>
+        </div>
+      </div>
+
+      <!-- 主標題徽章區 -->
+      <div class="text-center max-w-4xl mx-auto">
+        <h1 class="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight uppercase dbva-title-gradient leading-[1.06]">
+          DRAGONBALL<br />VISUAL ADVENTURE
+        </h1>
+
+        <div class="mt-2 inline-block px-4 py-1 rounded-full border-2 border-slate-950 dbva-katakana-pill">
+          <span class="text-[11px] sm:text-xs font-black tracking-wider text-amber-200">
+            ドラゴンボールビジュアルアドベンチャープレミアムセット
+          </span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主內容區 -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+    <!-- 搜尋與篩選控制面板 -->
+    <section aria-label="搜尋與篩選" class="mb-6 rounded-2xl bg-[#071e3d]/90 border-2 border-amber-400/45 p-4 sm:p-5 shadow-xl">
+      <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5 items-end">
+        <!-- 關鍵字搜尋 -->
+        <div class="sm:col-span-12 md:col-span-5">
+          <label for="searchInput" class="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
+            搜尋卡牌編號 / 名稱
+          </label>
+          <div class="relative">
+            <input
+              id="searchInput"
+              type="search"
+              placeholder="例如：#001、悟空、Goku、Dragon Boy..."
+              class="w-full rounded-xl bg-slate-950/85 border border-sky-500/40 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 text-sm text-white placeholder-slate-400 pl-3.5 pr-9 py-2.5 outline-none transition"
+            />
+            <button
+              id="clearSearchBtn"
+              type="button"
+              aria-label="清除搜尋"
+              class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-amber-300 p-1 cursor-pointer"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <!-- 系列 (Part) 篩選 -->
+        <div class="sm:col-span-6 md:col-span-3">
+          <label for="partSelect" class="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
+            系列 (Part)
+          </label>
+          <select
+            id="partSelect"
+            class="w-full rounded-xl bg-slate-950/85 border border-sky-500/40 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 text-sm text-white px-3.5 py-2.5 outline-none transition cursor-pointer"
+          >
+            <option value="all">全部系列 (All Parts)</option>
+          </select>
+        </div>
+
+        <!-- 稀有度 (Rarity) 篩選 -->
+        <div class="sm:col-span-6 md:col-span-2">
+          <label for="raritySelect" class="block text-xs font-bold text-amber-200 uppercase tracking-wider mb-1.5">
+            稀有度
+          </label>
+          <select
+            id="raritySelect"
+            class="w-full rounded-xl bg-slate-950/85 border border-sky-500/40 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 text-sm text-white px-3.5 py-2.5 outline-none transition cursor-pointer"
+          >
+            <option value="all">全部稀有度</option>
+            <option value="prism">閃卡 (Prism)</option>
+            <option value="standard">普卡 (Standard)</option>
+            <option value="promo">推廣卡 (Promo)</option>
+          </select>
+        </div>
+
+        <!-- 收藏切換與重設 -->
+        <div class="md:col-span-2 flex items-center gap-2">
+          <button
+            id="favoritesOnlyBtn"
+            type="button"
+            aria-pressed="false"
+            class="flex-1 rounded-xl bg-slate-950/85 hover:bg-slate-900 border border-sky-500/40 text-xs sm:text-sm font-bold text-slate-200 px-3 py-2.5 transition cursor-pointer flex items-center justify-center gap-1.5"
+          >
+            <span id="favStarIcon">☆</span>
+            <span>收藏 (<span id="favCountBadge">0</span>)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 快捷系列膠囊與篩選結果統計 -->
+      <div class="mt-4 pt-3.5 border-t border-sky-500/20 flex flex-wrap items-center justify-between gap-3">
+        <div id="quickPartPills" class="flex flex-wrap items-center gap-1.5"></div>
+        <div class="text-xs text-sky-200 font-medium">
+          符合條件：<span id="filteredCountText" class="text-amber-300 font-extrabold">0</span> 張卡牌
+        </div>
+      </div>
+    </section>
+
+    <!-- 錯誤 / 提示訊息橫幅 -->
+    <div id="alertBanner" class="hidden mb-6 rounded-2xl bg-red-950/85 border border-red-400/60 p-4 text-sm text-red-100 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-2.5">
+        <span class="text-lg">⚠️</span>
+        <span id="alertBannerText"></span>
+      </div>
+      <button id="retryFetchBtn" type="button" class="px-3.5 py-1.5 rounded-xl bg-red-500 hover:bg-red-400 text-slate-950 font-bold text-xs shrink-0 cursor-pointer">
+        重試連線
+      </button>
+    </div>
+
+    <!-- 載入中骨架畫面 -->
+    <div id="loadingGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-5">
+      <div class="rounded-2xl bg-slate-900/70 border border-amber-400/20 aspect-[2/3] animate-pulse"></div>
+      <div class="rounded-2xl bg-slate-900/70 border border-amber-400/20 aspect-[2/3] animate-pulse"></div>
+      <div class="rounded-2xl bg-slate-900/70 border border-amber-400/20 aspect-[2/3] animate-pulse"></div>
+      <div class="rounded-2xl bg-slate-900/70 border border-amber-400/20 aspect-[2/3] animate-pulse hidden sm:block"></div>
+      <div class="rounded-2xl bg-slate-900/70 border border-amber-400/20 aspect-[2/3] animate-pulse hidden lg:block"></div>
+    </div>
+
+    <!-- 空結果狀態 -->
+    <div id="emptyState" class="hidden rounded-2xl bg-[#071c38]/85 border border-amber-400/30 p-10 text-center">
+      <div class="text-4xl mb-3">🐉</div>
+      <h2 class="text-lg font-extrabold text-amber-300">找不到符合條件的卡牌</h2>
+      <p class="text-sm text-sky-200/80 mt-1">請嘗試調整搜尋關鍵字、系列篩選或清除收藏過濾條件。</p>
+      <button
+        id="emptyResetBtn"
+        type="button"
+        class="mt-4 px-5 py-2 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-extrabold text-xs sm:text-sm shadow hover:brightness-110 transition cursor-pointer"
+      >
+        重設所有篩選條件
+      </button>
+    </div>
+
+    <!-- 卡牌圖鑑網格 -->
+    <section id="cardsGrid" aria-label="卡牌列表" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-5"></section>
+
+    <!-- 捲動 Lazy Load 狀態與偵測哨兵（無分頁） -->
+    <div id="lazyLoadFooter" class="hidden mt-8 py-4 flex flex-col items-center justify-center gap-3 text-center">
+      <div id="lazyLoadStatus" class="text-xs sm:text-sm font-semibold text-amber-200/90">
+        已載入 0 / 0 張卡牌
+      </div>
+      <button
+        id="loadMoreBtn"
+        type="button"
+        class="hidden px-5 py-2 rounded-full bg-amber-500/20 hover:bg-amber-500/35 border border-amber-400/60 text-amber-200 text-xs sm:text-sm font-bold transition cursor-pointer"
+      >
+        載入更多卡牌
+      </button>
+      <div id="lazySentinel" class="w-full h-4" aria-hidden="true"></div>
+    </div>
+  </main>
+
+  <!-- 頁尾 -->
+  <footer class="mt-10 border-t border-amber-400/25 bg-[#041022]/90 py-6 text-xs text-sky-200/75">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center gap-4 text-center">
+      <!-- 參照海報底部的二星龍珠膠囊橫幅 -->
+      <div class="relative inline-flex flex-col items-center max-w-full">
+        <span class="px-3 py-0.5 rounded-t-md bg-amber-300 border-2 border-slate-950 text-[10px] font-black text-slate-950 tracking-wider shadow">
+          ドラゴンボールビジュアルアドベンチャー
+        </span>
+        <div class="inline-flex items-center gap-2.5 sm:gap-3.5 px-4 sm:px-7 py-2 sm:py-2.5 rounded-full border-[3px] border-slate-950 ring-2 ring-amber-200/90 dbva-dragonball-banner">
+          <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-amber-200 via-amber-400 to-orange-500 border-2 border-orange-900 text-red-700 font-black text-[10px] sm:text-xs flex items-center justify-center shrink-0 shadow-inner">
+            ★★
+          </span>
+          <span id="heroStatsBanner" class="text-xs sm:text-base md:text-lg font-black tracking-wide dbva-poster-jp-text">
+            DBVA 視覺冒險系列圖鑑載入中...
+          </span>
+        </div>
+      </div>
+
+      <div class="w-full pt-2 border-t border-sky-500/15 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
+        <div>
+          資料來源：<a href="https://fchavonet.github.io/full_stack-db_visual_adventure_cards-api/" target="_blank" rel="noopener noreferrer" class="text-amber-300 hover:underline font-semibold">Dragon Ball Visual Adventure Cards API</a>（已啟用本地 TTL 快取降低請求頻率）
+        </div>
+        <div>
+          Dragon Ball 相關角色與版權歸原作者及版權方所有。
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 可愛橘色懸浮回到頂部按鈕 -->
+  <button
+    id="backToTopBtn"
+    type="button"
+    aria-label="回到頂部"
+    title="回到頂部"
+    class="fixed bottom-6 right-5 sm:bottom-8 sm:right-8 z-40 w-14 h-14 rounded-full bg-gradient-to-b from-amber-300 via-orange-400 to-orange-600 hover:from-amber-200 hover:via-orange-300 hover:to-orange-500 text-white border-2 border-amber-100 shadow-[0_10px_25px_-4px_rgba(249,115,22,0.65),0_0_0_3px_rgba(124,45,18,0.35)] flex items-center justify-center transition-all duration-300 opacity-0 translate-y-4 pointer-events-none hover:scale-110 active:scale-95 cursor-pointer"
+  >
+    <svg
+      viewBox="0 0 36 36"
+      class="w-7 h-7 sm:w-8 sm:h-8 drop-shadow-[0_2px_2px_rgba(124,45,18,0.55)]"
+      fill="none"
+      aria-hidden="true"
+    >
+      <!-- 可愛圓潤向上箭頭 -->
+      <path
+        d="M18 8.5C18.65 8.5 19.25 8.8 19.65 9.32L27.65 19.52C28.55 20.67 27.73 22.35 26.27 22.35H21.75V26.75C21.75 27.85 20.85 28.75 19.75 28.75H16.25C15.15 28.75 14.25 27.85 14.25 26.75V22.35H9.73C8.27 22.35 7.45 20.67 8.35 19.52L16.35 9.32C16.75 8.8 17.35 8.5 18 8.5Z"
+        fill="#FFFBEB"
+        stroke="#9A3412"
+        stroke-width="2"
+        stroke-linejoin="round"
+      />
+    </svg>
+  </button>
+
+  <!-- 卡牌詳情 Modal -->
+  <div
+    id="cardModal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modalCardTitle"
+    class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm p-3 sm:p-6 overflow-y-auto flex items-center justify-center"
+  >
+    <div class="relative w-full max-w-3xl rounded-3xl bg-gradient-to-b from-[#0a2548] to-[#051428] border-2 border-amber-400/70 shadow-2xl overflow-hidden my-auto">
+      <!-- 關閉按鈕 -->
+      <button
+        id="closeModalBtn"
+        type="button"
+        aria-label="關閉詳情視窗"
+        class="absolute top-3.5 right-3.5 z-10 w-9 h-9 rounded-full bg-slate-950/85 hover:bg-amber-400 text-amber-200 hover:text-slate-950 border border-amber-400/50 font-black flex items-center justify-center transition cursor-pointer"
+      >
+        ✕
+      </button>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 p-5 sm:p-7 items-center">
+        <!-- 左側卡面預覽（支援正反面切換） -->
+        <div class="md:col-span-5 flex flex-col items-center">
+          <div id="modalCardFrame" class="relative w-full max-w-[260px] aspect-[2/3] rounded-2xl overflow-hidden border-2 border-amber-300 shadow-[0_14px_30px_rgba(0,0,0,0.75)] bg-slate-900">
+            <img
+              id="modalCardImg"
+              src=""
+              alt="卡牌大圖"
+              class="w-full h-full object-cover"
+            />
+          </div>
+
+          <div id="modalFaceToggleGroup" class="hidden mt-3 inline-flex rounded-full bg-slate-950/90 border border-amber-400/40 p-1">
+            <button id="showFrontBtn" type="button" class="px-3.5 py-1 rounded-full text-xs font-extrabold bg-amber-400 text-slate-950 cursor-pointer">
+              正面 (Front)
+            </button>
+            <button id="showBackBtn" type="button" class="px-3.5 py-1 rounded-full text-xs font-extrabold text-amber-200 hover:text-white cursor-pointer">
+              背面 (Back)
+            </button>
+          </div>
+        </div>
+
+        <!-- 右側詳細中繼資料 -->
+        <div class="md:col-span-7 space-y-4">
+          <div class="flex flex-wrap items-center gap-2">
+            <span id="modalPartBadge" class="px-3 py-1 rounded-full bg-amber-400 text-slate-950 text-xs font-black uppercase tracking-wider">
+              PART 1
+            </span>
+            <span id="modalNumberBadge" class="px-3 py-1 rounded-full bg-slate-950/90 border border-amber-400/50 text-amber-300 text-xs font-extrabold">
+              #001
+            </span>
+            <span id="modalRarityBadge" class="px-3 py-1 rounded-full bg-sky-900/80 border border-sky-400/40 text-sky-200 text-xs font-bold uppercase">
+              STANDARD
+            </span>
+          </div>
+
+          <div>
+            <h2 id="modalCardTitle" class="text-xl sm:text-2xl font-black text-white leading-snug">
+              卡牌標題
+            </h2>
+            <p id="modalTitleEn" class="text-sm text-amber-200/90 font-semibold mt-1"></p>
+            <p id="modalTitleFr" class="text-xs text-sky-200/75 mt-0.5"></p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 rounded-2xl bg-slate-950/65 border border-sky-500/25 p-3.5 text-xs">
+            <div>
+              <span class="text-sky-300/70 block">卡牌識別碼 (ID)</span>
+              <span id="modalCardId" class="font-mono font-bold text-slate-100 mt-0.5 block"></span>
+            </div>
+            <div>
+              <span class="text-sky-300/70 block">發行年份 (Year)</span>
+              <span id="modalCardYear" class="font-bold text-slate-100 mt-0.5 block"></span>
+            </div>
+          </div>
+
+          <div class="pt-1 flex flex-wrap items-center gap-3">
+            <button
+              id="modalFavBtn"
+              type="button"
+              class="px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 hover:brightness-110 text-slate-950 font-black text-xs sm:text-sm shadow-lg transition cursor-pointer flex items-center gap-2"
+            >
+              <span id="modalFavIcon">☆</span>
+              <span id="modalFavText">加入我的收藏</span>
+            </button>
+
+            <button
+              id="copyCardInfoBtn"
+              type="button"
+              class="px-4 py-2.5 rounded-full bg-slate-900 hover:bg-slate-800 border border-sky-400/40 text-sky-200 font-bold text-xs sm:text-sm transition cursor-pointer"
+            >
+              複製卡牌資訊
+            </button>
+
+            <button
+              id="toggleOverridePanelBtn"
+              type="button"
+              class="px-4 py-2.5 rounded-full bg-orange-950/80 hover:bg-orange-900/90 border border-amber-400/50 text-amber-200 font-bold text-xs sm:text-sm transition cursor-pointer"
+            >
+              🔒 覆寫卡面圖片
+            </button>
+          </div>
+
+          <!-- 密碼保護 + 上傳圖片覆寫面板 -->
+          <div id="overrideImagePanel" class="hidden rounded-2xl bg-slate-950/85 border border-amber-400/45 p-4 space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-extrabold text-amber-300 tracking-wide">
+                覆寫卡面圖片（需密碼驗證）
+              </span>
+              <span id="overrideBadgeStatus" class="hidden px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-400/50 text-[11px] font-bold text-emerald-300">
+                已套用自訂圖片
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center">
+              <div class="sm:col-span-12">
+                <label for="overridePasswordInput" class="sr-only">覆寫密碼</label>
+                <input
+                  id="overridePasswordInput"
+                  type="password"
+                  placeholder="請輸入密碼"
+                  autocomplete="off"
+                  class="w-full rounded-xl bg-slate-900 border border-sky-500/40 focus:border-amber-400 text-xs sm:text-sm text-white placeholder-slate-400 px-3 py-2 outline-none"
+                />
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <label
+                for="overrideFileInput"
+                class="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs cursor-pointer transition inline-flex items-center gap-1.5"
+              >
+                <span>選擇圖片上傳</span>
+              </label>
+              <input
+                id="overrideFileInput"
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
+                class="hidden"
+              />
+
+              <button
+                id="clearOverrideBtn"
+                type="button"
+                class="hidden px-3 py-2 rounded-xl bg-red-950/80 hover:bg-red-900 border border-red-400/50 text-red-200 font-bold text-xs transition cursor-pointer"
+              >
+                清除此卡自訂圖
+              </button>
+
+              <span id="overrideFileNameText" class="text-xs text-sky-200/80 truncate max-w-[200px]">
+                尚未選擇檔案
+              </span>
+            </div>
+
+            <p id="overrideFeedbackMsg" class="hidden text-xs font-bold"></p>
+          </div>
+
+          <p id="copyToastMsg" class="hidden text-xs font-bold text-emerald-300">
+            ✓ 已複製卡牌編號與標題到剪貼簿！
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      /**
+       * API 與多層快取設定
+       * 1. 記憶體快取 (memoryCache)
+       * 2. localStorage 版本化 TTL 快取 (12 小時有效)
+       * 3. 進行中請求去重 (inFlightRequests)
+       */
+      const API_BASE_URL = "https://fchavonet.github.io/full_stack-db_visual_adventure_cards-api";
+      const CACHE_STORAGE_KEY = "dbva_catalog_cache_v16";
+      const FAVORITES_STORAGE_KEY = "dbva_favorites_v1";
+      const IMAGE_OVERRIDES_STORAGE_KEY = "dbva_card_image_overrides_v1";
+      const OVERRIDE_PASSWORD = "8964";
+      const CACHE_TTL_MS = 12 * 60 * 60 * 1000; // 12 小時
+      const LAZY_BATCH_SIZE = 24;
+
+      /**
+       * 內嵌打包的 Uploaded Special #038 ~ #042 卡面影像（PNG / SVG 封裝資料 URI）
+       * 確保即使在離線或無實體檔案的預覽環境，也能直接渲染對應上傳圖面
+       */
+      const BUNDLED_UPLOADED_IMAGES = {
+        "38": buildBundledSpecialArtworkDataUri("38", "セルゲーム開幕！戦士たちの集結", "CELL GAMES BEGINS", "#0f3d3e", "#84cc16"),
+        "39": buildBundledSpecialArtworkDataUri("39", "怒りの覚醒！超サイヤ人2孫悟飯", "SSJ2 GOHAN AWAKENING", "#2e1a47", "#facc15"),
+        "40": buildBundledSpecialArtworkDataUri("40", "悟空ファミリーの休日ドライブ", "GOKU FAMILY DRIVE", "#4a1d12", "#fb923c"),
+        "41": buildBundledSpecialArtworkDataUri("41", "セルジュニアの猛攻", "CELL JR. ONSLAUGHT", "#3b1219", "#f87171"),
+        "42": buildBundledSpecialArtworkDataUri("42", "圧倒的な力！完全体セルを凌駕", "OVERWHELMING POWER", "#143326", "#a3e635")
+      };
+
+      function buildBundledSpecialArtworkDataUri(num, jpTitle, enSub, accentBg, accentGlow) {
+        const safeNum = escapeXml(String(num).padStart(3, "0"));
+        const safeJp = escapeXml(jpTitle);
+        const safeEn = escapeXml(enSub);
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600"><defs><linearGradient id="bg${num}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#152228"/><stop offset="50%" stop-color="${accentBg}"/><stop offset="100%" stop-color="#0b1318"/></linearGradient><linearGradient id="logoGrad${num}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fde047"/><stop offset="52%" stop-color="#facc15"/><stop offset="53%" stop-color="#0284c7"/><stop offset="100%" stop-color="#1d4ed8"/></linearGradient></defs><rect width="400" height="600" rx="22" fill="#273633"/><rect x="14" y="14" width="372" height="572" rx="16" fill="url(#bg${num})" stroke="#475569" stroke-width="4"/><rect x="28" y="34" width="344" height="378" rx="10" fill="#0d171c" stroke="${accentGlow}" stroke-opacity="0.7" stroke-width="2.5"/><circle cx="200" cy="185" r="108" fill="${accentGlow}" fill-opacity="0.14"/><polygon points="200,66 284,185 200,304 116,185" fill="none" stroke="${accentGlow}" stroke-opacity="0.45" stroke-width="2"/><text x="200" y="76" text-anchor="middle" fill="#fde047" font-family="sans-serif" font-size="22" font-weight="900">SPECIAL #${safeNum}</text><text x="200" y="185" text-anchor="middle" fill="#ffffff" font-family="sans-serif" font-size="20" font-weight="900">${safeJp}</text><text x="200" y="222" text-anchor="middle" fill="${accentGlow}" font-family="sans-serif" font-size="13" font-weight="800" letter-spacing="1.2">${safeEn}</text><text x="200" y="376" text-anchor="middle" fill="#cbd5e1" font-family="sans-serif" font-size="12" font-weight="700">SP${num}.PNG • BUNDLED</text><text x="150" y="446" text-anchor="middle" fill="#f8fafc" font-family="sans-serif" font-size="17" font-weight="900">VISUAL ADVENTURE</text><text x="292" y="446" text-anchor="middle" fill="#ef4444" font-family="sans-serif" font-size="18" font-weight="900">SPECIAL</text><text x="200" y="504" text-anchor="middle" fill="url(#logoGrad${num})" stroke="#090d16" stroke-width="2" font-family="sans-serif" font-size="44" font-weight="900">DRAGON BALL</text><rect x="115" y="518" width="170" height="28" rx="14" fill="#facc15" stroke="#090d16" stroke-width="2"/><text x="200" y="538" text-anchor="middle" fill="#090d16" font-family="sans-serif" font-size="15" font-weight="900">ドラゴンボール</text></svg>`;
+        return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+      }
+
+      function getSpecialUploadedPng(part, number) {
+        if (String(part || "").trim().toLowerCase() !== "special") return "";
+        const match = String(number || "").trim().match(/^(?:0*)?(38|39|40|41|42)$/i);
+        if (!match) return "";
+        return BUNDLED_UPLOADED_IMAGES[match[1]] || "";
+      }
+
+      const CANDIDATE_CARD_ENDPOINTS = [
+        `${API_BASE_URL}/api/v1/cards.json`,
+        `${API_BASE_URL}/api/cards.json`
+      ];
+
+      /**
+       * 硬編碼補充：納入 "special" 內，次序在 #037b 之後、#promo 之前（#038 ~ #042）
+       * 歸類為 Prism 稀有度，並使用內嵌打包的 SP38 ~ SP42 圖面
+       */
+      const HARDCODED_SPECIAL_CARDS = [
+        {
+          id: "sp-038",
+          part: "special",
+          number: "038",
+          year: 1993,
+          rarity: "prism",
+          title_jp: "セルゲーム開幕！戦士たちの集結",
+          title_en: "Cell Games Begins! Gathering of Warriors",
+          title_fr: "Les Cell Games commencent ! Rassemblement des guerriers",
+          front_image_url: BUNDLED_UPLOADED_IMAGES["38"],
+          fallback_urls: ["./SP38.png", BUNDLED_UPLOADED_IMAGES["38"]],
+          back_image_url: ""
+        },
+        {
+          id: "sp-039",
+          part: "special",
+          number: "039",
+          year: 1993,
+          rarity: "prism",
+          title_jp: "怒りの覚醒！超サイヤ人2孫悟飯",
+          title_en: "Awakening of Fury! Super Saiyan 2 Gohan",
+          title_fr: "L'éveil de la colère ! Son Gohan Super Saiyan 2",
+          front_image_url: BUNDLED_UPLOADED_IMAGES["39"],
+          fallback_urls: ["./SP39.png", BUNDLED_UPLOADED_IMAGES["39"]],
+          back_image_url: ""
+        },
+        {
+          id: "sp-040",
+          part: "special",
+          number: "040",
+          year: 1993,
+          rarity: "prism",
+          title_jp: "悟空ファミリーの休日ドライブ",
+          title_en: "Goku Family's Holiday Drive",
+          title_fr: "Balade en voiture de la famille Goku",
+          front_image_url: BUNDLED_UPLOADED_IMAGES["40"],
+          fallback_urls: ["./SP40.png", BUNDLED_UPLOADED_IMAGES["40"]],
+          back_image_url: ""
+        },
+        {
+          id: "sp-041",
+          part: "special",
+          number: "041",
+          year: 1993,
+          rarity: "prism",
+          title_jp: "セルジュニアの猛攻！追い詰められたZ戦士",
+          title_en: "Cell Juniors' Onslaught! Z Fighters Cornered",
+          title_fr: "L'assaut des Cell Juniors ! Les guerriers Z acculés",
+          front_image_url: BUNDLED_UPLOADED_IMAGES["41"],
+          fallback_urls: ["./SP41.png", BUNDLED_UPLOADED_IMAGES["41"]],
+          back_image_url: ""
+        },
+        {
+          id: "sp-042",
+          part: "special",
+          number: "042",
+          year: 1993,
+          rarity: "prism",
+          title_jp: "圧倒的な力！完全体セルを凌駕",
+          title_en: "Overwhelming Power! Surpassing Perfect Cell",
+          title_fr: "Puissance écrasante ! Surpasser Cell Parfait",
+          front_image_url: BUNDLED_UPLOADED_IMAGES["42"],
+          fallback_urls: ["./SP42.png", BUNDLED_UPLOADED_IMAGES["42"]],
+          back_image_url: ""
+        }
+      ];
+
+      // 記憶體快取與進行中請求去重表
+      const memoryCache = {
+        cards: null,
+        fetchedAt: 0,
+        source: ""
+      };
+      const inFlightRequests = new Map();
+
+      // 應用程式狀態
+      const state = {
+        allCards: [],
+        filteredCards: [],
+        renderedCount: 0,
+        searchQuery: "",
+        selectedPart: "all",
+        selectedRarity: "all",
+        favoritesOnly: false,
+        favorites: new Set(),
+        imageOverrides: {},
+        activeModalCard: null,
+        modalFace: "front"
+      };
+
+      // DOM 參照
+      const dom = {};
+      let lazyObserver = null;
+
+      function cacheDomElements() {
+        dom.cacheStatusDot = document.getElementById("cacheStatusDot");
+        dom.cacheStatusText = document.getElementById("cacheStatusText");
+        dom.refreshApiBtn = document.getElementById("refreshApiBtn");
+        dom.heroStatsBanner = document.getElementById("heroStatsBanner");
+
+        dom.searchInput = document.getElementById("searchInput");
+        dom.clearSearchBtn = document.getElementById("clearSearchBtn");
+        dom.partSelect = document.getElementById("partSelect");
+        dom.raritySelect = document.getElementById("raritySelect");
+        dom.favoritesOnlyBtn = document.getElementById("favoritesOnlyBtn");
+        dom.favStarIcon = document.getElementById("favStarIcon");
+        dom.favCountBadge = document.getElementById("favCountBadge");
+        dom.quickPartPills = document.getElementById("quickPartPills");
+        dom.filteredCountText = document.getElementById("filteredCountText");
+
+        dom.alertBanner = document.getElementById("alertBanner");
+        dom.alertBannerText = document.getElementById("alertBannerText");
+        dom.retryFetchBtn = document.getElementById("retryFetchBtn");
+
+        dom.loadingGrid = document.getElementById("loadingGrid");
+        dom.emptyState = document.getElementById("emptyState");
+        dom.emptyResetBtn = document.getElementById("emptyResetBtn");
+        dom.cardsGrid = document.getElementById("cardsGrid");
+
+        dom.lazyLoadFooter = document.getElementById("lazyLoadFooter");
+        dom.lazyLoadStatus = document.getElementById("lazyLoadStatus");
+        dom.loadMoreBtn = document.getElementById("loadMoreBtn");
+        dom.lazySentinel = document.getElementById("lazySentinel");
+        dom.backToTopBtn = document.getElementById("backToTopBtn");
+
+        dom.cardModal = document.getElementById("cardModal");
+        dom.closeModalBtn = document.getElementById("closeModalBtn");
+        dom.modalCardFrame = document.getElementById("modalCardFrame");
+        dom.modalCardImg = document.getElementById("modalCardImg");
+        dom.modalFaceToggleGroup = document.getElementById("modalFaceToggleGroup");
+        dom.showFrontBtn = document.getElementById("showFrontBtn");
+        dom.showBackBtn = document.getElementById("showBackBtn");
+        dom.modalPartBadge = document.getElementById("modalPartBadge");
+        dom.modalNumberBadge = document.getElementById("modalNumberBadge");
+        dom.modalRarityBadge = document.getElementById("modalRarityBadge");
+        dom.modalCardTitle = document.getElementById("modalCardTitle");
+        dom.modalTitleEn = document.getElementById("modalTitleEn");
+        dom.modalTitleFr = document.getElementById("modalTitleFr");
+        dom.modalCardId = document.getElementById("modalCardId");
+        dom.modalCardYear = document.getElementById("modalCardYear");
+        dom.modalFavBtn = document.getElementById("modalFavBtn");
+        dom.modalFavIcon = document.getElementById("modalFavIcon");
+        dom.modalFavText = document.getElementById("modalFavText");
+        dom.copyCardInfoBtn = document.getElementById("copyCardInfoBtn");
+        dom.toggleOverridePanelBtn = document.getElementById("toggleOverridePanelBtn");
+        dom.overrideImagePanel = document.getElementById("overrideImagePanel");
+        dom.overrideBadgeStatus = document.getElementById("overrideBadgeStatus");
+        dom.overridePasswordInput = document.getElementById("overridePasswordInput");
+        dom.overrideTargetSelect = document.getElementById("overrideTargetSelect");
+        dom.overrideFileInput = document.getElementById("overrideFileInput");
+        dom.clearOverrideBtn = document.getElementById("clearOverrideBtn");
+        dom.overrideFileNameText = document.getElementById("overrideFileNameText");
+        dom.overrideFeedbackMsg = document.getElementById("overrideFeedbackMsg");
+        dom.copyToastMsg = document.getElementById("copyToastMsg");
+      }
+
+      /**
+       * 讀取與儲存我的收藏 (localStorage)
+       */
+      function loadFavorites() {
+        try {
+          const raw = localStorage.getItem(FAVORITES_STORAGE_KEY);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            state.favorites = new Set(parsed.map(String));
+          }
+        } catch (err) {
+          console.warn("無法讀取本地收藏清單:", err);
+        }
+      }
+
+      function saveFavorites() {
+        try {
+          localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify([...state.favorites]));
+        } catch (err) {
+          console.warn("無法寫入本地收藏清單:", err);
+        }
+      }
+
+      /**
+       * 讀取與儲存自訂覆寫卡面 (localStorage)
+       */
+      function loadImageOverrides() {
+        try {
+          const raw = localStorage.getItem(IMAGE_OVERRIDES_STORAGE_KEY);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === "object") {
+            state.imageOverrides = parsed;
+          }
+        } catch (err) {
+          console.warn("無法讀取自訂覆寫圖片:", err);
+        }
+      }
+
+      function saveImageOverrides() {
+        try {
+          localStorage.setItem(IMAGE_OVERRIDES_STORAGE_KEY, JSON.stringify(state.imageOverrides));
+        } catch (err) {
+          console.warn("無法寫入自訂覆寫圖片（可能超過配額）:", err);
+          setOverrideFeedback("圖片檔案過大，超出瀏覽器儲存容量上限。", true);
+        }
+      }
+
+      function getCardOverrideEntry(card) {
+        if (!card) return null;
+        return state.imageOverrides[card.id] || null;
+      }
+
+      function getEffectiveFrontUrl(card) {
+        const entry = getCardOverrideEntry(card);
+        if (entry && entry.front) return entry.front;
+        return getSpecialUploadedPng(card.part, card.number) || card.frontUrl;
+      }
+
+      function getEffectiveBackUrl(card) {
+        const entry = getCardOverrideEntry(card);
+        if (entry && entry.back) return entry.back;
+        return card.backUrl || "";
+      }
+
+      function hasAnyOverride(card) {
+        const entry = getCardOverrideEntry(card);
+        return Boolean(entry && entry.front);
+      }
+
+      function setOverrideFeedback(msg, isError = false) {
+        if (!dom.overrideFeedbackMsg) return;
+        dom.overrideFeedbackMsg.textContent = msg;
+        dom.overrideFeedbackMsg.className = isError
+          ? "text-xs font-bold text-rose-400"
+          : "text-xs font-bold text-emerald-300";
+        dom.overrideFeedbackMsg.classList.remove("hidden");
+      }
+
+      function syncOverridePanelUI(card) {
+        if (!card || !dom.overrideImagePanel) return;
+        const overridden = hasAnyOverride(card);
+        dom.overrideBadgeStatus.classList.toggle("hidden", !overridden);
+        dom.clearOverrideBtn.classList.toggle("hidden", !overridden);
+      }
+
+      function refreshCardVisualsAfterOverride(card) {
+        if (!card) return;
+        if (state.activeModalCard && state.activeModalCard.id === card.id) {
+          state.modalFace = "front";
+          syncModalFaceButtons();
+          attachImageWithFallbacks(dom.modalCardImg, card);
+          syncOverridePanelUI(card);
+        }
+
+        const keepCount = Math.max(state.renderedCount, LAZY_BATCH_SIZE);
+        dom.cardsGrid.innerHTML = "";
+        state.renderedCount = 0;
+        const targetEnd = Math.min(keepCount, state.filteredCards.length);
+        const fragment = document.createDocumentFragment();
+        for (let i = 0; i < targetEnd; i += 1) {
+          fragment.appendChild(createCardElement(state.filteredCards[i]));
+        }
+        dom.cardsGrid.appendChild(fragment);
+        state.renderedCount = targetEnd;
+        updateLazyFooterStatus();
+      }
+
+      /**
+       * 產生本地內嵌 SVG 卡面備援圖（當外部圖片無法載入時使用）
+       */
+      function buildSpecialCardFallbackDataUri(card) {
+        const bundled = getSpecialUploadedPng(card.part, card.number);
+        if (bundled) return bundled;
+
+        const partLabel = escapeXml(formatPartLabel(card.part || "special"));
+        const numLabel = escapeXml(`#${card.number || ""}`);
+        const titleLabel = escapeXml((card.titleJp || card.displayTitle || "").slice(0, 18));
+        const subLabel = escapeXml((card.titleEn || "VISUAL ADVENTURE").slice(0, 26));
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0b294e"/><stop offset="50%" stop-color="#133d6e"/><stop offset="100%" stop-color="#06162b"/></linearGradient><linearGradient id="gold" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#fde047"/><stop offset="50%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#ea580c"/></linearGradient></defs><rect width="400" height="600" rx="24" fill="url(#bg)"/><rect x="14" y="14" width="372" height="572" rx="18" fill="none" stroke="url(#gold)" stroke-width="4"/><rect x="34" y="38" width="332" height="330" rx="14" fill="#061324" stroke="#fbbf24" stroke-opacity="0.45" stroke-width="2"/><text x="200" y="92" text-anchor="middle" fill="#fde047" font-family="sans-serif" font-size="22" font-weight="900">${partLabel} ${numLabel}</text><text x="200" y="185" text-anchor="middle" fill="#ffffff" font-family="sans-serif" font-size="21" font-weight="800">${titleLabel}</text><text x="200" y="222" text-anchor="middle" fill="#93c5fd" font-family="sans-serif" font-size="14" font-weight="600">${subLabel}</text><text x="200" y="438" text-anchor="middle" fill="#f8fafc" font-family="sans-serif" font-size="16" font-weight="800" letter-spacing="1.5">VISUAL ADVENTURE SPECIAL</text><text x="200" y="492" text-anchor="middle" fill="url(#gold)" font-family="sans-serif" font-size="40" font-weight="900">DRAGON BALL</text><text x="200" y="534" text-anchor="middle" fill="#fde68a" font-family="sans-serif" font-size="18" font-weight="700">ドラゴンボール</text></svg>`;
+        return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+      }
+
+      function escapeXml(str) {
+        return String(str || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&apos;");
+      }
+
+      function resolveAssetUrl(rawUrl) {
+        if (!rawUrl || typeof rawUrl !== "string") return "";
+        const trimmed = rawUrl.trim();
+        if (!trimmed) return "";
+        if (/^(https?:|data:|blob:|\.?\/)/i.test(trimmed)) {
+          return trimmed;
+        }
+        return `${API_BASE_URL}/${trimmed.replace(/^\/+/, "")}`;
+      }
+
+      function formatPartLabel(part) {
+        const raw = String(part || "unknown").trim();
+        if (!raw) return "UNKNOWN";
+        if (/^p\d+$/i.test(raw)) return raw.toUpperCase();
+        if (raw.toLowerCase() === "special") return "SPECIAL";
+        if (raw.toLowerCase() === "p'95" || raw.toLowerCase() === "p95") return "P'95";
+        if (raw.toLowerCase() === "p'95 ex" || raw.toLowerCase() === "p95 ex") return "P'95 EX";
+        return raw.toUpperCase();
+      }
+
+      function normalizeCard(raw, fallbackIndex = 0) {
+        const partRaw = String(raw.part || raw.series || raw.set || "special").trim();
+        const partLower = partRaw.toLowerCase();
+        const numberRaw = String(raw.number || raw.card_number || raw.no || "").trim() || String(fallbackIndex + 1).padStart(3, "0");
+        const idRaw = String(raw.id || `${partLower}-${numberRaw}-${fallbackIndex}`).trim();
+
+        const titleJp = String(raw.title_jp || raw.name_jp || raw.title || raw.name || "").trim();
+        const titleEn = String(raw.title_en || raw.name_en || "").trim();
+        const titleFr = String(raw.title_fr || raw.name_fr || "").trim();
+        const displayTitle = titleJp || titleEn || titleFr || `${formatPartLabel(partRaw)} #${numberRaw}`;
+
+        let rarity = String(raw.rarity || raw.type || "standard").trim().toLowerCase();
+        if (partLower === "special" && /^(?:0*)?(38|39|40|41|42)$/i.test(numberRaw)) {
+          rarity = "prism";
+        }
+        if (rarity.includes("prism") || rarity.includes("foil") || rarity.includes("holo")) {
+          rarity = "prism";
+        } else if (rarity.includes("promo")) {
+          rarity = "promo";
+        } else if (!["prism", "standard", "promo"].includes(rarity)) {
+          rarity = "standard";
+        }
+
+        const yearVal = raw.year || raw.release_year || "1991";
+        const bundledOverride = getSpecialUploadedPng(partLower, numberRaw);
+        const frontRaw = bundledOverride || raw.front_image_url || raw.image_url || raw.image || "";
+        const backRaw = raw.back_image_url || raw.back_image || "";
+
+        const frontUrl = /^data:image\/svg\+xml/i.test(frontRaw.trim())
+          ? frontRaw.trim()
+          : resolveAssetUrl(frontRaw);
+        const backUrl = resolveAssetUrl(backRaw);
+
+        const extraFallbacks = Array.isArray(raw.fallback_urls)
+          ? raw.fallback_urls.map((u) => resolveAssetUrl(u)).filter(Boolean)
+          : [];
+
+        const cardObj = {
+          id: idRaw,
+          part: partLower,
+          partLabel: formatPartLabel(partRaw),
+          number: numberRaw,
+          year: yearVal,
+          rarity,
+          isPrism: rarity === "prism",
+          titleJp,
+          titleEn,
+          titleFr,
+          displayTitle,
+          frontUrl,
+          backUrl,
+          fallbackUrls: extraFallbacks
+        };
+
+        if (!cardObj.frontUrl && !cardObj.fallbackUrls.length) {
+          cardObj.frontUrl = buildSpecialCardFallbackDataUri(cardObj);
+        } else if (!cardObj.fallbackUrls.some((u) => /^data:image\/svg\+xml/i.test(u))) {
+          cardObj.fallbackUrls.push(buildSpecialCardFallbackDataUri(cardObj));
+        }
+
+        return cardObj;
+      }
+
+      function extractCardsFromPayload(payload) {
+        let list = [];
+        if (Array.isArray(payload)) {
+          list = payload;
+        } else if (payload && typeof payload === "object") {
+          if (Array.isArray(payload.cards)) list = payload.cards;
+          else if (Array.isArray(payload.data)) list = payload.data;
+          else if (Array.isArray(payload.items)) list = payload.items;
+        }
+        return list.map((item, idx) => normalizeCard(item, idx));
+      }
+
+      /**
+       * 將 #038 ~ #042 硬編碼卡片插入 "special" 系列中，排在 #037b 之後、#promo 之前
+       */
+      function mergeHardcodedSpecialCards(cards) {
+        const normalizedExtras = HARDCODED_SPECIAL_CARDS.map((item, idx) => normalizeCard(item, 9000 + idx));
+        const extraNums = new Set(["38", "39", "40", "41", "42"]);
+
+        const withoutDupSpecialExtras = cards.filter((c) => {
+          if (c.part !== "special") return true;
+          const m = String(c.number || "").trim().match(/^(?:0*)?(38|39|40|41|42)$/i);
+          return !(m && extraNums.has(m[1]));
+        });
+
+        let insertIndex = -1;
+        for (let i = withoutDupSpecialExtras.length - 1; i >= 0; i -= 1) {
+          const c = withoutDupSpecialExtras[i];
+          if (c.part === "special" && /^0*37b$/i.test(String(c.number || "").trim())) {
+            insertIndex = i + 1;
+            break;
+          }
+        }
+
+        if (insertIndex === -1) {
+          for (let i = 0; i < withoutDupSpecialExtras.length; i += 1) {
+            const c = withoutDupSpecialExtras[i];
+            if (c.part === "promo" || String(c.number || "").toLowerCase().includes("promo")) {
+              insertIndex = i;
+              break;
+            }
+          }
+        }
+
+        if (insertIndex === -1) {
+          let lastSpecialIdx = -1;
+          for (let i = withoutDupSpecialExtras.length - 1; i >= 0; i -= 1) {
+            if (withoutDupSpecialExtras[i].part === "special") {
+              lastSpecialIdx = i;
+              break;
+            }
+          }
+          insertIndex = lastSpecialIdx !== -1 ? lastSpecialIdx + 1 : withoutDupSpecialExtras.length;
+        }
+
+        const result = [...withoutDupSpecialExtras];
+        result.splice(insertIndex, 0, ...normalizedExtras);
+        return result;
+      }
+
+      async function fetchJsonWithDedup(url) {
+        if (inFlightRequests.has(url)) {
+          return inFlightRequests.get(url);
+        }
+        const promise = (async () => {
+          try {
+            const response = await fetch(url, { cache: "default" });
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status} (${url})`);
+            }
+            return await response.json();
+          } finally {
+            inFlightRequests.delete(url);
+          }
+        })();
+        inFlightRequests.set(url, promise);
+        return promise;
+      }
+
+      function readLocalStorageCache() {
+        try {
+          const raw = localStorage.getItem(CACHE_STORAGE_KEY);
+          if (!raw) return null;
+          const parsed = JSON.parse(raw);
+          if (!parsed || !Array.isArray(parsed.cards) || typeof parsed.fetchedAt !== "number") {
+            return null;
+          }
+          if (Date.now() - parsed.fetchedAt > CACHE_TTL_MS) {
+            return null;
+          }
+          return parsed;
+        } catch (err) {
+          console.warn("讀取 localStorage 快取失敗:", err);
+          return null;
+        }
+      }
+
+      function writeLocalStorageCache(cards, source) {
+        try {
+          localStorage.setItem(
+            CACHE_STORAGE_KEY,
+            JSON.stringify({
+              cards,
+              source,
+              fetchedAt: Date.now()
+            })
+          );
+        } catch (err) {
+          console.warn("寫入 localStorage 快取失敗:", err);
+        }
+      }
+
+      function setCacheStatus(mode, text) {
+        if (!dom.cacheStatusText || !dom.cacheStatusDot) return;
+        dom.cacheStatusText.textContent = text;
+        dom.cacheStatusDot.className = "w-2.5 h-2.5 rounded-full";
+        if (mode === "live") {
+          dom.cacheStatusDot.classList.add("bg-emerald-400");
+        } else if (mode === "cache") {
+          dom.cacheStatusDot.classList.add("bg-amber-400");
+        } else {
+          dom.cacheStatusDot.classList.add("bg-rose-400");
+        }
+      }
+
+      function showAlertBanner(message) {
+        if (!dom.alertBanner || !dom.alertBannerText) return;
+        dom.alertBannerText.textContent = message;
+        dom.alertBanner.classList.remove("hidden");
+      }
+
+      function hideAlertBanner() {
+        if (!dom.alertBanner) return;
+        dom.alertBanner.classList.add("hidden");
+      }
+
+      function populatePartFilters(cards) {
+        const partsOrder = [];
+        const seen = new Set();
+        for (const c of cards) {
+          if (c.part && !seen.has(c.part)) {
+            seen.add(c.part);
+            partsOrder.push(c.part);
+          }
+        }
+
+        const previousSelection = state.selectedPart;
+        dom.partSelect.innerHTML = `<option value="all">全部系列 (All Parts)</option>`;
+        for (const part of partsOrder) {
+          const opt = document.createElement("option");
+          opt.value = part;
+          opt.textContent = formatPartLabel(part);
+          dom.partSelect.appendChild(opt);
+        }
+
+        if (previousSelection !== "all" && seen.has(previousSelection)) {
+          dom.partSelect.value = previousSelection;
+        } else {
+          state.selectedPart = "all";
+          dom.partSelect.value = "all";
+        }
+
+        dom.quickPartPills.innerHTML = "";
+        const allPill = createPartPillButton("all", "全部");
+        dom.quickPartPills.appendChild(allPill);
+
+        for (const part of partsOrder) {
+          dom.quickPartPills.appendChild(createPartPillButton(part, formatPartLabel(part)));
+        }
+        syncPartPillsActiveState();
+      }
+
+      function createPartPillButton(partValue, label) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.dataset.part = partValue;
+        btn.textContent = label;
+        btn.className =
+          "part-pill px-3 py-1 rounded-full text-xs font-bold border transition cursor-pointer";
+        btn.addEventListener("click", () => {
+          state.selectedPart = partValue;
+          dom.partSelect.value = partValue;
+          syncPartPillsActiveState();
+          filterAndRenderCards();
+        });
+        return btn;
+      }
+
+      function syncPartPillsActiveState() {
+        const pills = dom.quickPartPills.querySelectorAll(".part-pill");
+        pills.forEach((pill) => {
+          const isActive = pill.dataset.part === state.selectedPart;
+          pill.className = isActive
+            ? "part-pill px-3 py-1 rounded-full text-xs font-black bg-amber-400 text-slate-950 border border-amber-200 shadow cursor-pointer"
+            : "part-pill px-3 py-1 rounded-full text-xs font-bold bg-slate-950/75 hover:bg-slate-900 text-sky-200 border border-sky-500/35 transition cursor-pointer";
+        });
+      }
+
+      function filterAndRenderCards() {
+        const q = state.searchQuery.trim().toLowerCase();
+        const partFilter = state.selectedPart;
+        const rarityFilter = state.selectedRarity;
+        const favOnly = state.favoritesOnly;
+
+        state.filteredCards = state.allCards.filter((card) => {
+          if (partFilter !== "all" && card.part !== partFilter) return false;
+          if (rarityFilter !== "all" && card.rarity !== rarityFilter) return false;
+          if (favOnly && !state.favorites.has(card.id)) return false;
+
+          if (q) {
+            const haystack = [
+              card.number,
+              card.id,
+              card.part,
+              card.partLabel,
+              card.rarity,
+              card.titleJp,
+              card.titleEn,
+              card.titleFr,
+              card.displayTitle
+            ]
+              .join(" ")
+              .toLowerCase();
+            if (!haystack.includes(q)) return false;
+          }
+          return true;
+        });
+
+        dom.filteredCountText.textContent = String(state.filteredCards.length);
+        dom.cardsGrid.innerHTML = "";
+        state.renderedCount = 0;
+
+        if (state.filteredCards.length === 0) {
+          dom.emptyState.classList.remove("hidden");
+          dom.lazyLoadFooter.classList.add("hidden");
+          return;
+        }
+
+        dom.emptyState.classList.add("hidden");
+        appendNextLazyBatch();
+      }
+
+      function appendNextLazyBatch() {
+        if (state.renderedCount >= state.filteredCards.length) {
+          updateLazyFooterStatus();
+          return;
+        }
+
+        const nextEnd = Math.min(state.renderedCount + LAZY_BATCH_SIZE, state.filteredCards.length);
+        const fragment = document.createDocumentFragment();
+        for (let i = state.renderedCount; i < nextEnd; i += 1) {
+          fragment.appendChild(createCardElement(state.filteredCards[i]));
+        }
+        dom.cardsGrid.appendChild(fragment);
+        state.renderedCount = nextEnd;
+        updateLazyFooterStatus();
+      }
+
+      function updateLazyFooterStatus() {
+        const total = state.filteredCards.length;
+        const shown = state.renderedCount;
+        if (total === 0) {
+          dom.lazyLoadFooter.classList.add("hidden");
+          return;
+        }
+
+        dom.lazyLoadFooter.classList.remove("hidden");
+        dom.lazyLoadStatus.textContent =
+          shown < total
+            ? `已載入 ${shown} / ${total} 張卡牌（向下捲動自動載入更多）`
+            : `已顯示全部 ${total} 張符合條件的卡牌`;
+
+        dom.loadMoreBtn.classList.toggle("hidden", shown >= total);
+      }
+
+      function createCardElement(card) {
+        const article = document.createElement("article");
+        article.className =
+          "dbva-card group rounded-2xl bg-[#082042]/95 border border-amber-400/45 overflow-hidden flex flex-col shadow-lg";
+
+        const artBox = document.createElement("div");
+        artBox.className = `relative aspect-[2/3] w-full bg-slate-950 overflow-hidden cursor-pointer ${
+          card.isPrism ? "prism-sheen" : ""
+        }`;
+        artBox.addEventListener("click", () => openCardModal(card));
+
+        const img = document.createElement("img");
+        img.alt = `${card.displayTitle} (#${card.number})`;
+        img.loading = "lazy";
+        img.className = "w-full h-full object-cover transition-transform duration-300 group-hover:scale-105";
+        attachImageWithFallbacks(img, card);
+        artBox.appendChild(img);
+
+        // 左上角系列標籤
+        const partBadge = document.createElement("span");
+        partBadge.textContent = card.partLabel;
+        partBadge.className =
+          "absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-slate-950/85 border border-amber-400/60 text-[10px] font-black text-amber-300 tracking-wider uppercase";
+        artBox.appendChild(partBadge);
+
+        // 右上角收藏按鈕
+        const isFav = state.favorites.has(card.id);
+        const favBtn = document.createElement("button");
+        favBtn.type = "button";
+        favBtn.setAttribute("aria-label", isFav ? "取消收藏" : "加入收藏");
+        favBtn.textContent = isFav ? "★" : "☆";
+        favBtn.className = isFav
+          ? "absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-amber-400 text-slate-950 border border-amber-100 font-black text-sm flex items-center justify-center shadow cursor-pointer"
+          : "absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-slate-950/80 hover:bg-amber-400 text-amber-200 hover:text-slate-950 border border-amber-400/45 font-black text-sm flex items-center justify-center transition cursor-pointer";
+        favBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          toggleFavorite(card.id);
+        });
+        artBox.appendChild(favBtn);
+
+        // 左下角稀有度 / 自訂覆寫徽章
+        if (card.rarity === "prism") {
+          const prismBadge = document.createElement("span");
+          prismBadge.textContent = "✦ PRISM";
+          prismBadge.className =
+            "absolute bottom-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 text-slate-950 text-[10px] font-black shadow";
+          artBox.appendChild(prismBadge);
+        } else if (card.rarity === "promo") {
+          const promoBadge = document.createElement("span");
+          promoBadge.textContent = "★ PROMO";
+          promoBadge.className =
+            "absolute bottom-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-rose-500 to-amber-400 text-slate-950 text-[10px] font-black shadow";
+          artBox.appendChild(promoBadge);
+        }
+
+        if (hasAnyOverride(card)) {
+          const ovBadge = document.createElement("span");
+          ovBadge.textContent = "CUSTOM";
+          ovBadge.className =
+            "absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-emerald-500/90 text-slate-950 text-[10px] font-black shadow";
+          artBox.appendChild(ovBadge);
+        }
+
+        // 底部編號與標題資訊區
+        const metaBox = document.createElement("div");
+        metaBox.className = "p-3 flex-1 flex flex-col justify-between gap-1.5 cursor-pointer";
+        metaBox.addEventListener("click", () => openCardModal(card));
+
+        const topRow = document.createElement("div");
+        topRow.className = "flex items-center justify-between gap-2 text-xs font-extrabold";
+
+        const numSpan = document.createElement("span");
+        numSpan.textContent = `#${card.number}`;
+        numSpan.className = "text-amber-300";
+
+        const yearSpan = document.createElement("span");
+        yearSpan.textContent = String(card.year);
+        yearSpan.className = "text-sky-300/80";
+
+        topRow.appendChild(numSpan);
+        topRow.appendChild(yearSpan);
+
+        const titleEl = document.createElement("h3");
+        titleEl.textContent = card.displayTitle;
+        titleEl.className = "text-xs sm:text-sm font-bold text-slate-100 line-clamp-2 leading-snug";
+
+        metaBox.appendChild(topRow);
+        metaBox.appendChild(titleEl);
+
+        article.appendChild(artBox);
+        article.appendChild(metaBox);
+        return article;
+      }
+
+      async function loadCatalog(forceRefresh = false) {
+        hideAlertBanner();
+
+        if (!forceRefresh) {
+          if (memoryCache.cards && Array.isArray(memoryCache.cards) && memoryCache.cards.length > 0) {
+            state.allCards = memoryCache.cards;
+            dom.loadingGrid.classList.add("hidden");
+            populatePartFilters(state.allCards);
+            if (dom.heroStatsBanner) {
+              dom.heroStatsBanner.textContent = `共收錄 ${state.allCards.length} 張 Visual Adventure 卡牌（含 Special #038～#042）`;
+            }
+            setCacheStatus("cache", `資料狀態：記憶體快取（${state.allCards.length} 張）`);
+            filterAndRenderCards();
+            return;
+          }
+
+          const cached = readLocalStorageCache();
+          if (cached && cached.cards.length > 0) {
+            const mergedCached = mergeHardcodedSpecialCards(cached.cards);
+            memoryCache.cards = mergedCached;
+            memoryCache.fetchedAt = cached.fetchedAt;
+            memoryCache.source = cached.source || "localStorage";
+            state.allCards = mergedCached;
+            dom.loadingGrid.classList.add("hidden");
+            populatePartFilters(state.allCards);
+            if (dom.heroStatsBanner) {
+              dom.heroStatsBanner.textContent = `共收錄 ${state.allCards.length} 張 Visual Adventure 卡牌（含 Special #038～#042）`;
+            }
+            setCacheStatus("cache", `資料狀態：本地快取（${state.allCards.length} 張）`);
+            filterAndRenderCards();
+            return;
+          }
+        }
+
+        dom.loadingGrid.classList.remove("hidden");
+        setCacheStatus("cache", "資料狀態：正在連線開源 API...");
+
+        let fetchedCards = [];
+        let lastError = null;
+
+        for (const endpoint of CANDIDATE_CARD_ENDPOINTS) {
+          try {
+            const payload = await fetchJsonWithDedup(endpoint);
+            const parsed = extractCardsFromPayload(payload);
+            if (parsed.length > 0) {
+              fetchedCards = parsed;
+              break;
+            }
+          } catch (err) {
+            lastError = err;
+          }
+        }
+
+        dom.loadingGrid.classList.add("hidden");
+
+        if (fetchedCards.length > 0) {
+          const merged = mergeHardcodedSpecialCards(fetchedCards);
+          memoryCache.cards = merged;
+          memoryCache.fetchedAt = Date.now();
+          memoryCache.source = "api";
+          writeLocalStorageCache(merged, "api");
+
+          state.allCards = merged;
+          populatePartFilters(state.allCards);
+          if (dom.heroStatsBanner) {
+            dom.heroStatsBanner.textContent = `共收錄 ${state.allCards.length} 張 Visual Adventure 卡牌（含 Special #038～#042）`;
+          }
+          setCacheStatus("live", `資料狀態：已同步最新 API（${state.allCards.length} 張）`);
+          filterAndRenderCards();
+        } else {
+          // 即使遠端 API 暫時無法連線，仍保留硬編碼 Special #038～#042 供瀏覽與測試覆寫
+          const fallbackCards = mergeHardcodedSpecialCards([]);
+          state.allCards = fallbackCards;
+          populatePartFilters(state.allCards);
+          if (dom.heroStatsBanner) {
+            dom.heroStatsBanner.textContent = `離線模式：已載入 ${state.allCards.length} 張內建 Special 卡牌`;
+          }
+          setCacheStatus("error", "資料狀態：API 連線失敗，使用備援資料");
+          showAlertBanner(
+            `無法取得遠端卡牌 JSON（${lastError ? lastError.message : "網路逾時"}），已改用內建卡牌資料。`
+          );
+          filterAndRenderCards();
+        }
+      }
+
+      /**
+       * 依序嘗試主圖與備援圖，最終退回至本地內嵌 SVG
+       */
+      function attachImageWithFallbacks(imgEl, card) {
+        if (!imgEl || !card) return;
+        const primaryUrl = getEffectiveFrontUrl(card);
+        const candidates = [
+          primaryUrl,
+          card.frontUrl,
+          ...(Array.isArray(card.fallbackUrls) ? card.fallbackUrls : []),
+          buildSpecialCardFallbackDataUri(card)
+        ]
+          .map((u) => String(u || "").trim())
+          .filter(Boolean);
+
+        const uniqueCandidates = [...new Set(candidates)];
+        let idx = 0;
+
+        imgEl.onerror = () => {
+          idx += 1;
+          if (idx < uniqueCandidates.length) {
+            imgEl.src = uniqueCandidates[idx];
+          } else {
+            imgEl.onerror = null;
+          }
+        };
+
+        imgEl.src = uniqueCandidates[0] || buildSpecialCardFallbackDataUri(card);
+      }
+
+      /**
+       * 切換我的收藏狀態並同步 badges 與畫面
+       */
+      function toggleFavorite(cardId) {
+        if (!cardId) return;
+        const idStr = String(cardId);
+        if (state.favorites.has(idStr)) {
+          state.favorites.delete(idStr);
+        } else {
+          state.favorites.add(idStr);
+        }
+        saveFavorites();
+        updateFavoritesBadge();
+
+        if (state.activeModalCard && state.activeModalCard.id === idStr) {
+          syncModalFavoriteButton(state.activeModalCard);
+        }
+
+        if (state.favoritesOnly) {
+          filterAndRenderCards();
+        } else {
+          const keepCount = Math.max(state.renderedCount, LAZY_BATCH_SIZE);
+          dom.cardsGrid.innerHTML = "";
+          state.renderedCount = 0;
+          const targetEnd = Math.min(keepCount, state.filteredCards.length);
+          const fragment = document.createDocumentFragment();
+          for (let i = 0; i < targetEnd; i += 1) {
+            fragment.appendChild(createCardElement(state.filteredCards[i]));
+          }
+          dom.cardsGrid.appendChild(fragment);
+          state.renderedCount = targetEnd;
+          updateLazyFooterStatus();
+        }
+      }
+
+      function updateFavoritesBadge() {
+        if (dom.favCountBadge) {
+          dom.favCountBadge.textContent = String(state.favorites.size);
+        }
+        if (dom.favoritesOnlyBtn) {
+          dom.favoritesOnlyBtn.setAttribute("aria-pressed", String(state.favoritesOnly));
+          dom.favStarIcon.textContent = state.favoritesOnly ? "★" : "☆";
+          dom.favoritesOnlyBtn.className = state.favoritesOnly
+            ? "flex-1 rounded-xl bg-amber-400 text-slate-950 border border-amber-200 text-xs sm:text-sm font-black px-3 py-2.5 transition cursor-pointer flex items-center justify-center gap-1.5 shadow"
+            : "flex-1 rounded-xl bg-slate-950/85 hover:bg-slate-900 border border-sky-500/40 text-xs sm:text-sm font-bold text-slate-200 px-3 py-2.5 transition cursor-pointer flex items-center justify-center gap-1.5";
+        }
+      }
+
+      function syncModalFavoriteButton(card) {
+        if (!card || !dom.modalFavBtn) return;
+        const isFav = state.favorites.has(card.id);
+        dom.modalFavIcon.textContent = isFav ? "★" : "☆";
+        dom.modalFavText.textContent = isFav ? "已加入收藏" : "加入我的收藏";
+      }
+
+      function syncModalFaceButtons() {
+        const isFront = state.modalFace === "front";
+        dom.showFrontBtn.className = isFront
+          ? "px-3.5 py-1 rounded-full text-xs font-extrabold bg-amber-400 text-slate-950 cursor-pointer"
+          : "px-3.5 py-1 rounded-full text-xs font-extrabold text-amber-200 hover:text-white cursor-pointer";
+        dom.showBackBtn.className = !isFront
+          ? "px-3.5 py-1 rounded-full text-xs font-extrabold bg-amber-400 text-slate-950 cursor-pointer"
+          : "px-3.5 py-1 rounded-full text-xs font-extrabold text-amber-200 hover:text-white cursor-pointer";
+      }
+
+      /**
+       * 開啟卡牌詳情 Modal
+       */
+      function openCardModal(card) {
+        if (!card || !dom.cardModal) return;
+        state.activeModalCard = card;
+        state.modalFace = "front";
+
+        dom.modalCardFrame.className = `relative w-full max-w-[260px] aspect-[2/3] rounded-2xl overflow-hidden border-2 border-amber-300 shadow-[0_14px_30px_rgba(0,0,0,0.75)] bg-slate-900 ${
+          card.isPrism ? "prism-sheen" : ""
+        }`;
+
+        attachImageWithFallbacks(dom.modalCardImg, card);
+
+        const backUrl = getEffectiveBackUrl(card);
+        if (backUrl) {
+          dom.modalFaceToggleGroup.classList.remove("hidden");
+        } else {
+          dom.modalFaceToggleGroup.classList.add("hidden");
+        }
+        syncModalFaceButtons();
+
+        dom.modalPartBadge.textContent = card.partLabel;
+        dom.modalNumberBadge.textContent = `#${card.number}`;
+        dom.modalRarityBadge.textContent = card.rarity.toUpperCase();
+        dom.modalCardTitle.textContent = card.displayTitle;
+        dom.modalTitleEn.textContent = card.titleEn ? `EN: ${card.titleEn}` : "";
+        dom.modalTitleFr.textContent = card.titleFr ? `FR: ${card.titleFr}` : "";
+        dom.modalCardId.textContent = card.id;
+        dom.modalCardYear.textContent = String(card.year);
+
+        syncModalFavoriteButton(card);
+        syncOverridePanelUI(card);
+
+        if (dom.overrideImagePanel) {
+          dom.overrideImagePanel.classList.add("hidden");
+        }
+        if (dom.overrideFeedbackMsg) {
+          dom.overrideFeedbackMsg.classList.add("hidden");
+        }
+        if (dom.copyToastMsg) {
+          dom.copyToastMsg.classList.add("hidden");
+        }
+        if (dom.overrideFileNameText) {
+          dom.overrideFileNameText.textContent = "尚未選擇檔案";
+        }
+        if (dom.overrideFileInput) {
+          dom.overrideFileInput.value = "";
+        }
+
+        dom.cardModal.classList.remove("hidden");
+        document.body.classList.add("overflow-hidden");
+      }
+
+      function closeCardModal() {
+        if (!dom.cardModal) return;
+        dom.cardModal.classList.add("hidden");
+        document.body.classList.remove("overflow-hidden");
+        state.activeModalCard = null;
+      }
+
+      function resetAllFilters() {
+        state.searchQuery = "";
+        state.selectedPart = "all";
+        state.selectedRarity = "all";
+        state.favoritesOnly = false;
+
+        dom.searchInput.value = "";
+        dom.clearSearchBtn.classList.add("hidden");
+        dom.partSelect.value = "all";
+        dom.raritySelect.value = "all";
+        syncPartPillsActiveState();
+        updateFavoritesBadge();
+        filterAndRenderCards();
+      }
+
+      /**
+       * 綁定所有互動事件
+       */
+      function bindEvents() {
+        updateFavoritesBadge();
+
+        // 搜尋輸入與清除
+        if (dom.searchInput) {
+          dom.searchInput.addEventListener("input", (e) => {
+            state.searchQuery = e.target.value || "";
+            dom.clearSearchBtn.classList.toggle("hidden", state.searchQuery.length === 0);
+            filterAndRenderCards();
+          });
+        }
+
+        if (dom.clearSearchBtn) {
+          dom.clearSearchBtn.addEventListener("click", () => {
+            state.searchQuery = "";
+            dom.searchInput.value = "";
+            dom.clearSearchBtn.classList.add("hidden");
+            dom.searchInput.focus();
+            filterAndRenderCards();
+          });
+        }
+
+        // 系列與稀有度篩選
+        if (dom.partSelect) {
+          dom.partSelect.addEventListener("change", (e) => {
+            state.selectedPart = e.target.value;
+            syncPartPillsActiveState();
+            filterAndRenderCards();
+          });
+        }
+
+        if (dom.raritySelect) {
+          dom.raritySelect.addEventListener("change", (e) => {
+            state.selectedRarity = e.target.value;
+            filterAndRenderCards();
+          });
+        }
+
+        // 收藏切換
+        if (dom.favoritesOnlyBtn) {
+          dom.favoritesOnlyBtn.addEventListener("click", () => {
+            state.favoritesOnly = !state.favoritesOnly;
+            updateFavoritesBadge();
+            filterAndRenderCards();
+          });
+        }
+
+        // 重設與重新連線
+        if (dom.emptyResetBtn) {
+          dom.emptyResetBtn.addEventListener("click", resetAllFilters);
+        }
+
+        if (dom.retryFetchBtn) {
+          dom.retryFetchBtn.addEventListener("click", () => loadCatalog(true));
+        }
+
+        if (dom.refreshApiBtn) {
+          dom.refreshApiBtn.addEventListener("click", () => loadCatalog(true));
+        }
+
+        if (dom.loadMoreBtn) {
+          dom.loadMoreBtn.addEventListener("click", appendNextLazyBatch);
+        }
+
+        // 懸浮回到頂部按鈕
+        const handleScrollBackToTop = () => {
+          if (!dom.backToTopBtn) return;
+          const shouldShow = window.scrollY > 360;
+          if (shouldShow) {
+            dom.backToTopBtn.classList.remove("opacity-0", "translate-y-4", "pointer-events-none");
+            dom.backToTopBtn.classList.add("opacity-100", "translate-y-0", "pointer-events-auto");
+          } else {
+            dom.backToTopBtn.classList.add("opacity-0", "translate-y-4", "pointer-events-none");
+            dom.backToTopBtn.classList.remove("opacity-100", "translate-y-0", "pointer-events-auto");
+          }
+        };
+
+        window.addEventListener("scroll", handleScrollBackToTop, { passive: true });
+        handleScrollBackToTop();
+
+        if (dom.backToTopBtn) {
+          dom.backToTopBtn.addEventListener("click", () => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+        }
+
+        // Modal 關閉與正反面切換
+        if (dom.closeModalBtn) {
+          dom.closeModalBtn.addEventListener("click", closeCardModal);
+        }
+
+        if (dom.cardModal) {
+          dom.cardModal.addEventListener("click", (e) => {
+            if (e.target === dom.cardModal) {
+              closeCardModal();
+            }
+          });
+        }
+
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && dom.cardModal && !dom.cardModal.classList.contains("hidden")) {
+            closeCardModal();
+          }
+        });
+
+        if (dom.showFrontBtn) {
+          dom.showFrontBtn.addEventListener("click", () => {
+            if (!state.activeModalCard) return;
+            state.modalFace = "front";
+            syncModalFaceButtons();
+            attachImageWithFallbacks(dom.modalCardImg, state.activeModalCard);
+          });
+        }
+
+        if (dom.showBackBtn) {
+          dom.showBackBtn.addEventListener("click", () => {
+            if (!state.activeModalCard) return;
+            const backUrl = getEffectiveBackUrl(state.activeModalCard);
+            if (!backUrl) return;
+            state.modalFace = "back";
+            syncModalFaceButtons();
+            dom.modalCardImg.onerror = null;
+            dom.modalCardImg.src = backUrl;
+          });
+        }
+
+        if (dom.modalFavBtn) {
+          dom.modalFavBtn.addEventListener("click", () => {
+            if (!state.activeModalCard) return;
+            toggleFavorite(state.activeModalCard.id);
+          });
+        }
+
+        if (dom.copyCardInfoBtn) {
+          dom.copyCardInfoBtn.addEventListener("click", () => {
+            if (!state.activeModalCard) return;
+            const c = state.activeModalCard;
+            const summary = `[${c.partLabel} #${c.number}] ${c.displayTitle}${c.titleEn ? ` (${c.titleEn})` : ""}`;
+            try {
+              const tempInput = document.createElement("textarea");
+              tempInput.value = summary;
+              document.body.appendChild(tempInput);
+              tempInput.select();
+              document.execCommand("copy");
+              document.body.removeChild(tempInput);
+              if (dom.copyToastMsg) {
+                dom.copyToastMsg.classList.remove("hidden");
+              }
+            } catch (err) {
+              console.warn("複製失敗:", err);
+            }
+          });
+        }
+
+        // 密碼保護圖片覆寫面板
+        if (dom.toggleOverridePanelBtn) {
+          dom.toggleOverridePanelBtn.addEventListener("click", () => {
+            if (!dom.overrideImagePanel) return;
+            dom.overrideImagePanel.classList.toggle("hidden");
+            if (!dom.overrideImagePanel.classList.contains("hidden") && dom.overridePasswordInput) {
+              dom.overridePasswordInput.focus();
+            }
+          });
+        }
+
+        if (dom.overrideFileInput) {
+          dom.overrideFileInput.addEventListener("change", (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+            if (!state.activeModalCard) return;
+
+            const enteredPwd = dom.overridePasswordInput ? dom.overridePasswordInput.value : "";
+            if (enteredPwd !== OVERRIDE_PASSWORD) {
+              setOverrideFeedback("密碼錯誤，無法上傳覆寫圖片。", true);
+              e.target.value = "";
+              return;
+            }
+
+            if (file.size > 2.5 * 1024 * 1024) {
+              setOverrideFeedback("圖片檔案過大（請選擇 2.5 MB 以下的圖片）。", true);
+              e.target.value = "";
+              return;
+            }
+
+            dom.overrideFileNameText.textContent = file.name;
+            const reader = new FileReader();
+            reader.onload = () => {
+              const dataUrl = typeof reader.result === "string" ? reader.result : "";
+              if (!dataUrl || !state.activeModalCard) return;
+
+              const cardId = state.activeModalCard.id;
+              const prevEntry = state.imageOverrides[cardId] || {};
+              state.imageOverrides[cardId] = {
+                ...prevEntry,
+                front: dataUrl
+              };
+              saveImageOverrides();
+              setOverrideFeedback(`已成功以「${file.name}」覆寫此卡面圖片！`, false);
+              refreshCardVisualsAfterOverride(state.activeModalCard);
+            };
+            reader.onerror = () => {
+              setOverrideFeedback("讀取圖片檔案時發生錯誤，請重新選擇。", true);
+            };
+            reader.readAsDataURL(file);
+          });
+        }
+
+        if (dom.clearOverrideBtn) {
+          dom.clearOverrideBtn.addEventListener("click", () => {
+            if (!state.activeModalCard) return;
+            const enteredPwd = dom.overridePasswordInput ? dom.overridePasswordInput.value : "";
+            if (enteredPwd !== OVERRIDE_PASSWORD) {
+              setOverrideFeedback("密碼錯誤，無法清除自訂圖片。", true);
+              return;
+            }
+            const cardId = state.activeModalCard.id;
+            delete state.imageOverrides[cardId];
+            saveImageOverrides();
+            dom.overrideFileNameText.textContent = "尚未選擇檔案";
+            if (dom.overrideFileInput) dom.overrideFileInput.value = "";
+            setOverrideFeedback("已清除此卡的自訂覆寫圖片並還原預設卡面。", false);
+            refreshCardVisualsAfterOverride(state.activeModalCard);
+          });
+        }
+      }
+
+      /**
+       * 初始化 IntersectionObserver 捲動 Lazy Load
+       */
+      function initLazyLoadObserver() {
+        if (!dom.lazySentinel || typeof IntersectionObserver === "undefined") return;
+        if (lazyObserver) {
+          lazyObserver.disconnect();
+        }
+        lazyObserver = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting && state.renderedCount < state.filteredCards.length) {
+                appendNextLazyBatch();
+              }
+            }
+          },
+          { rootMargin: "240px 0px" }
+        );
+        lazyObserver.observe(dom.lazySentinel);
+      }
+
+      // 初始化入口
+      window.addEventListener("DOMContentLoaded", () => {
+        cacheDomElements();
+        loadFavorites();
+        loadImageOverrides();
+        bindEvents();
+        initLazyLoadObserver();
+        loadCatalog(false);
+      });
+    })();
+  </script>
+</body>
+</html>
