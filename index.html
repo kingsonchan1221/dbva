@@ -333,44 +333,44 @@
     role="dialog"
     aria-modal="true"
     aria-labelledby="modalCardTitle"
-    class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm p-3 sm:p-6 overflow-y-auto flex items-center justify-center"
+    class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm p-2.5 sm:p-6 overflow-y-auto flex items-center justify-center"
   >
-    <div class="relative w-full max-w-3xl rounded-3xl bg-gradient-to-b from-[#0a2548] to-[#051428] border-2 border-amber-400/70 shadow-2xl overflow-hidden my-auto">
+    <div class="relative w-full max-w-[95vw] sm:max-w-3xl max-h-[88dvh] sm:max-h-[90vh] flex flex-col rounded-2xl sm:rounded-3xl bg-gradient-to-b from-[#0a2548] to-[#051428] border-2 border-amber-400/70 shadow-2xl overflow-hidden my-auto">
       <!-- 關閉按鈕 -->
       <button
         id="closeModalBtn"
         type="button"
         aria-label="關閉詳情視窗"
-        class="absolute top-3.5 right-3.5 z-10 w-9 h-9 rounded-full bg-slate-950/85 hover:bg-amber-400 text-amber-200 hover:text-slate-950 border border-amber-400/50 font-black flex items-center justify-center transition cursor-pointer"
+        class="absolute top-3 right-3 sm:top-3.5 sm:right-3.5 z-10 w-10 h-10 sm:w-9 sm:h-9 rounded-full bg-slate-950/85 hover:bg-amber-400 text-amber-200 hover:text-slate-950 border border-amber-400/50 font-black flex items-center justify-center transition cursor-pointer"
       >
         ✕
       </button>
 
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 p-5 sm:p-7 items-center">
+      <div class="overflow-y-auto overscroll-contain grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6 p-4 pt-12 sm:p-7 items-center">
         <!-- 左側卡面預覽（支援正反面切換） -->
         <div class="md:col-span-5 flex flex-col items-center">
-          <div id="modalCardFrame" class="relative w-full max-w-[260px] aspect-[2/3] rounded-2xl overflow-hidden border-2 border-amber-300 shadow-[0_14px_30px_rgba(0,0,0,0.75)] bg-slate-900">
+          <div id="modalCardFrame" class="relative w-full max-w-[175px] sm:max-w-[260px] max-h-[38dvh] sm:max-h-none aspect-[2/3] rounded-xl sm:rounded-2xl overflow-hidden border-2 border-amber-300 shadow-[0_14px_30px_rgba(0,0,0,0.75)] bg-slate-900">
             <img
               id="modalCardImg"
               src=""
               alt="卡牌大圖"
-              class="w-full h-full object-cover"
+              class="w-full h-full object-contain sm:object-cover"
             />
           </div>
 
-          <div id="modalFaceToggleGroup" class="hidden mt-3 inline-flex rounded-full bg-slate-950/90 border border-amber-400/40 p-1">
-            <button id="showFrontBtn" type="button" class="px-3.5 py-1 rounded-full text-xs font-extrabold bg-amber-400 text-slate-950 cursor-pointer">
+          <div id="modalFaceToggleGroup" class="hidden mt-2.5 sm:mt-3 inline-flex rounded-full bg-slate-950/90 border border-amber-400/40 p-1">
+            <button id="showFrontBtn" type="button" class="px-3.5 py-1.5 sm:py-1 rounded-full text-xs font-extrabold bg-amber-400 text-slate-950 cursor-pointer">
               正面 (Front)
             </button>
-            <button id="showBackBtn" type="button" class="px-3.5 py-1 rounded-full text-xs font-extrabold text-amber-200 hover:text-white cursor-pointer">
+            <button id="showBackBtn" type="button" class="px-3.5 py-1.5 sm:py-1 rounded-full text-xs font-extrabold text-amber-200 hover:text-white cursor-pointer">
               背面 (Back)
             </button>
           </div>
         </div>
 
         <!-- 右側詳細中繼資料 -->
-        <div class="md:col-span-7 space-y-4">
-          <div class="flex flex-wrap items-center gap-2">
+        <div class="md:col-span-7 space-y-3 sm:space-y-4">
+          <div class="flex flex-wrap items-center justify-center md:justify-start gap-1.5 sm:gap-2">
             <span id="modalPartBadge" class="px-3 py-1 rounded-full bg-amber-400 text-slate-950 text-xs font-black uppercase tracking-wider">
               PART 1
             </span>
@@ -382,18 +382,18 @@
             </span>
           </div>
 
-          <div>
-            <h2 id="modalCardTitle" class="text-xl sm:text-2xl font-black text-white leading-snug">
+          <div class="text-center md:text-left">
+            <h2 id="modalCardTitle" class="text-lg sm:text-2xl font-black text-white leading-snug">
               卡牌標題
             </h2>
-            <p id="modalTitleEn" class="text-sm text-amber-200/90 font-semibold mt-1"></p>
+            <p id="modalTitleEn" class="text-xs sm:text-sm text-amber-200/90 font-semibold mt-1"></p>
             <p id="modalTitleFr" class="text-xs text-sky-200/75 mt-0.5"></p>
           </div>
 
-          <div class="grid grid-cols-2 gap-3 rounded-2xl bg-slate-950/65 border border-sky-500/25 p-3.5 text-xs">
+          <div class="grid grid-cols-2 gap-2.5 sm:gap-3 rounded-xl sm:rounded-2xl bg-slate-950/65 border border-sky-500/25 p-3 sm:p-3.5 text-xs">
             <div>
               <span class="text-sky-300/70 block">卡牌識別碼 (ID)</span>
-              <span id="modalCardId" class="font-mono font-bold text-slate-100 mt-0.5 block"></span>
+              <span id="modalCardId" class="font-mono font-bold text-slate-100 mt-0.5 block break-all"></span>
             </div>
             <div>
               <span class="text-sky-300/70 block">發行年份 (Year)</span>
@@ -401,11 +401,11 @@
             </div>
           </div>
 
-          <div class="pt-1 flex flex-wrap items-center gap-3">
+          <div class="pt-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
             <button
               id="modalFavBtn"
               type="button"
-              class="px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 hover:brightness-110 text-slate-950 font-black text-xs sm:text-sm shadow-lg transition cursor-pointer flex items-center gap-2"
+              class="w-full sm:w-auto px-5 py-3 sm:py-2.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 hover:brightness-110 text-slate-950 font-black text-xs sm:text-sm shadow-lg transition cursor-pointer flex items-center justify-center gap-2"
             >
               <span id="modalFavIcon">☆</span>
               <span id="modalFavText">加入我的收藏</span>
@@ -414,75 +414,13 @@
             <button
               id="copyCardInfoBtn"
               type="button"
-              class="px-4 py-2.5 rounded-full bg-slate-900 hover:bg-slate-800 border border-sky-400/40 text-sky-200 font-bold text-xs sm:text-sm transition cursor-pointer"
+              class="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-full bg-slate-900 hover:bg-slate-800 border border-sky-400/40 text-sky-200 font-bold text-xs sm:text-sm transition cursor-pointer text-center"
             >
               複製卡牌資訊
             </button>
-
-            <button
-              id="toggleOverridePanelBtn"
-              type="button"
-              class="px-4 py-2.5 rounded-full bg-orange-950/80 hover:bg-orange-900/90 border border-amber-400/50 text-amber-200 font-bold text-xs sm:text-sm transition cursor-pointer"
-            >
-              🔒 覆寫卡面圖片
-            </button>
           </div>
 
-          <!-- 密碼保護 + 上傳圖片覆寫面板 -->
-          <div id="overrideImagePanel" class="hidden rounded-2xl bg-slate-950/85 border border-amber-400/45 p-4 space-y-3">
-            <div class="flex items-center justify-between gap-2">
-              <span class="text-xs font-extrabold text-amber-300 tracking-wide">
-                覆寫卡面圖片（需密碼驗證）
-              </span>
-              <span id="overrideBadgeStatus" class="hidden px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-400/50 text-[11px] font-bold text-emerald-300">
-                已套用自訂圖片
-              </span>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center">
-              <div class="sm:col-span-12">
-                <label for="overridePasswordInput" class="sr-only">覆寫密碼</label>
-                <input
-                  id="overridePasswordInput"
-                  type="password"
-                  placeholder="請輸入密碼"
-                  autocomplete="off"
-                  class="w-full rounded-xl bg-slate-900 border border-sky-500/40 focus:border-amber-400 text-xs sm:text-sm text-white placeholder-slate-400 px-3 py-2 outline-none"
-                />
-              </div>
-            </div>
-
-            <div class="flex flex-wrap items-center gap-2">
-              <label
-                for="overrideFileInput"
-                class="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs cursor-pointer transition inline-flex items-center gap-1.5"
-              >
-                <span>選擇圖片上傳</span>
-              </label>
-              <input
-                id="overrideFileInput"
-                type="file"
-                accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
-                class="hidden"
-              />
-
-              <button
-                id="clearOverrideBtn"
-                type="button"
-                class="hidden px-3 py-2 rounded-xl bg-red-950/80 hover:bg-red-900 border border-red-400/50 text-red-200 font-bold text-xs transition cursor-pointer"
-              >
-                清除此卡自訂圖
-              </button>
-
-              <span id="overrideFileNameText" class="text-xs text-sky-200/80 truncate max-w-[200px]">
-                尚未選擇檔案
-              </span>
-            </div>
-
-            <p id="overrideFeedbackMsg" class="hidden text-xs font-bold"></p>
-          </div>
-
-          <p id="copyToastMsg" class="hidden text-xs font-bold text-emerald-300">
+          <p id="copyToastMsg" class="hidden text-xs font-bold text-emerald-300 text-center md:text-left">
             ✓ 已複製卡牌編號與標題到剪貼簿！
           </p>
         </div>
@@ -501,12 +439,18 @@
        * 3. 進行中請求去重 (inFlightRequests)
        */
       const API_BASE_URL = "https://fchavonet.github.io/full_stack-db_visual_adventure_cards-api";
-      const CACHE_STORAGE_KEY = "dbva_catalog_cache_v16";
+      const CACHE_STORAGE_KEY = "dbva_catalog_cache_v18";
       const FAVORITES_STORAGE_KEY = "dbva_favorites_v1";
-      const IMAGE_OVERRIDES_STORAGE_KEY = "dbva_card_image_overrides_v1";
-      const OVERRIDE_PASSWORD = "8964";
       const CACHE_TTL_MS = 12 * 60 * 60 * 1000; // 12 小時
       const LAZY_BATCH_SIZE = 24;
+
+      const SPECIAL_REMOTE_IMAGES = {
+        "38": "https://kingsonchan1221.github.io/dbva/SP38.png",
+        "39": "https://kingsonchan1221.github.io/dbva/SP39.png",
+        "40": "https://kingsonchan1221.github.io/dbva/SP40.png",
+        "41": "https://kingsonchan1221.github.io/dbva/SP41.png",
+        "42": "https://kingsonchan1221.github.io/dbva/SP42.png"
+      };
 
       /**
        * 內嵌打包的 Uploaded Special #038 ~ #042 卡面影像（PNG / SVG 封裝資料 URI）
@@ -520,6 +464,15 @@
         "42": buildBundledSpecialArtworkDataUri("42", "圧倒的な力！完全体セルを凌駕", "OVERWHELMING POWER", "#143326", "#a3e635")
       };
 
+      function escapeXml(value) {
+        return String(value ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&apos;");
+      }
+
       function buildBundledSpecialArtworkDataUri(num, jpTitle, enSub, accentBg, accentGlow) {
         const safeNum = escapeXml(String(num).padStart(3, "0"));
         const safeJp = escapeXml(jpTitle);
@@ -532,7 +485,7 @@
         if (String(part || "").trim().toLowerCase() !== "special") return "";
         const match = String(number || "").trim().match(/^(?:0*)?(38|39|40|41|42)$/i);
         if (!match) return "";
-        return BUNDLED_UPLOADED_IMAGES[match[1]] || "";
+        return SPECIAL_REMOTE_IMAGES[match[1]] || BUNDLED_UPLOADED_IMAGES[match[1]] || "";
       }
 
       const CANDIDATE_CARD_ENDPOINTS = [
@@ -542,7 +495,7 @@
 
       /**
        * 硬編碼補充：納入 "special" 內，次序在 #037b 之後、#promo 之前（#038 ~ #042）
-       * 歸類為 Prism 稀有度，並使用內嵌打包的 SP38 ~ SP42 圖面
+       * 歸類為 Prism 稀有度，並使用指定的 SP38 ~ SP42 圖面網址
        */
       const HARDCODED_SPECIAL_CARDS = [
         {
@@ -554,8 +507,8 @@
           title_jp: "セルゲーム開幕！戦士たちの集結",
           title_en: "Cell Games Begins! Gathering of Warriors",
           title_fr: "Les Cell Games commencent ! Rassemblement des guerriers",
-          front_image_url: BUNDLED_UPLOADED_IMAGES["38"],
-          fallback_urls: ["./SP38.png", BUNDLED_UPLOADED_IMAGES["38"]],
+          front_image_url: SPECIAL_REMOTE_IMAGES["38"],
+          fallback_urls: [BUNDLED_UPLOADED_IMAGES["38"]],
           back_image_url: ""
         },
         {
@@ -567,8 +520,8 @@
           title_jp: "怒りの覚醒！超サイヤ人2孫悟飯",
           title_en: "Awakening of Fury! Super Saiyan 2 Gohan",
           title_fr: "L'éveil de la colère ! Son Gohan Super Saiyan 2",
-          front_image_url: BUNDLED_UPLOADED_IMAGES["39"],
-          fallback_urls: ["./SP39.png", BUNDLED_UPLOADED_IMAGES["39"]],
+          front_image_url: SPECIAL_REMOTE_IMAGES["39"],
+          fallback_urls: [BUNDLED_UPLOADED_IMAGES["39"]],
           back_image_url: ""
         },
         {
@@ -580,8 +533,8 @@
           title_jp: "悟空ファミリーの休日ドライブ",
           title_en: "Goku Family's Holiday Drive",
           title_fr: "Balade en voiture de la famille Goku",
-          front_image_url: BUNDLED_UPLOADED_IMAGES["40"],
-          fallback_urls: ["./SP40.png", BUNDLED_UPLOADED_IMAGES["40"]],
+          front_image_url: SPECIAL_REMOTE_IMAGES["40"],
+          fallback_urls: [BUNDLED_UPLOADED_IMAGES["40"]],
           back_image_url: ""
         },
         {
@@ -593,8 +546,8 @@
           title_jp: "セルジュニアの猛攻！追い詰められたZ戦士",
           title_en: "Cell Juniors' Onslaught! Z Fighters Cornered",
           title_fr: "L'assaut des Cell Juniors ! Les guerriers Z acculés",
-          front_image_url: BUNDLED_UPLOADED_IMAGES["41"],
-          fallback_urls: ["./SP41.png", BUNDLED_UPLOADED_IMAGES["41"]],
+          front_image_url: SPECIAL_REMOTE_IMAGES["41"],
+          fallback_urls: [BUNDLED_UPLOADED_IMAGES["41"]],
           back_image_url: ""
         },
         {
@@ -606,8 +559,8 @@
           title_jp: "圧倒的な力！完全体セルを凌駕",
           title_en: "Overwhelming Power! Surpassing Perfect Cell",
           title_fr: "Puissance écrasante ! Surpasser Cell Parfait",
-          front_image_url: BUNDLED_UPLOADED_IMAGES["42"],
-          fallback_urls: ["./SP42.png", BUNDLED_UPLOADED_IMAGES["42"]],
+          front_image_url: SPECIAL_REMOTE_IMAGES["42"],
+          fallback_urls: [BUNDLED_UPLOADED_IMAGES["42"]],
           back_image_url: ""
         }
       ];
@@ -630,7 +583,6 @@
         selectedRarity: "all",
         favoritesOnly: false,
         favorites: new Set(),
-        imageOverrides: {},
         activeModalCard: null,
         modalFace: "front"
       };
@@ -689,15 +641,6 @@
         dom.modalFavIcon = document.getElementById("modalFavIcon");
         dom.modalFavText = document.getElementById("modalFavText");
         dom.copyCardInfoBtn = document.getElementById("copyCardInfoBtn");
-        dom.toggleOverridePanelBtn = document.getElementById("toggleOverridePanelBtn");
-        dom.overrideImagePanel = document.getElementById("overrideImagePanel");
-        dom.overrideBadgeStatus = document.getElementById("overrideBadgeStatus");
-        dom.overridePasswordInput = document.getElementById("overridePasswordInput");
-        dom.overrideTargetSelect = document.getElementById("overrideTargetSelect");
-        dom.overrideFileInput = document.getElementById("overrideFileInput");
-        dom.clearOverrideBtn = document.getElementById("clearOverrideBtn");
-        dom.overrideFileNameText = document.getElementById("overrideFileNameText");
-        dom.overrideFeedbackMsg = document.getElementById("overrideFeedbackMsg");
         dom.copyToastMsg = document.getElementById("copyToastMsg");
       }
 
@@ -725,120 +668,40 @@
         }
       }
 
-      /**
-       * 讀取與儲存自訂覆寫卡面 (localStorage)
-       */
-      function loadImageOverrides() {
-        try {
-          const raw = localStorage.getItem(IMAGE_OVERRIDES_STORAGE_KEY);
-          if (!raw) return;
-          const parsed = JSON.parse(raw);
-          if (parsed && typeof parsed === "object") {
-            state.imageOverrides = parsed;
-          }
-        } catch (err) {
-          console.warn("無法讀取自訂覆寫圖片:", err);
-        }
-      }
-
-      function saveImageOverrides() {
-        try {
-          localStorage.setItem(IMAGE_OVERRIDES_STORAGE_KEY, JSON.stringify(state.imageOverrides));
-        } catch (err) {
-          console.warn("無法寫入自訂覆寫圖片（可能超過配額）:", err);
-          setOverrideFeedback("圖片檔案過大，超出瀏覽器儲存容量上限。", true);
-        }
-      }
-
-      function getCardOverrideEntry(card) {
-        if (!card) return null;
-        return state.imageOverrides[card.id] || null;
-      }
-
       function getEffectiveFrontUrl(card) {
-        const entry = getCardOverrideEntry(card);
-        if (entry && entry.front) return entry.front;
+        if (!card) return "";
         return getSpecialUploadedPng(card.part, card.number) || card.frontUrl;
       }
 
       function getEffectiveBackUrl(card) {
-        const entry = getCardOverrideEntry(card);
-        if (entry && entry.back) return entry.back;
+        if (!card) return "";
         return card.backUrl || "";
-      }
-
-      function hasAnyOverride(card) {
-        const entry = getCardOverrideEntry(card);
-        return Boolean(entry && entry.front);
-      }
-
-      function setOverrideFeedback(msg, isError = false) {
-        if (!dom.overrideFeedbackMsg) return;
-        dom.overrideFeedbackMsg.textContent = msg;
-        dom.overrideFeedbackMsg.className = isError
-          ? "text-xs font-bold text-rose-400"
-          : "text-xs font-bold text-emerald-300";
-        dom.overrideFeedbackMsg.classList.remove("hidden");
-      }
-
-      function syncOverridePanelUI(card) {
-        if (!card || !dom.overrideImagePanel) return;
-        const overridden = hasAnyOverride(card);
-        dom.overrideBadgeStatus.classList.toggle("hidden", !overridden);
-        dom.clearOverrideBtn.classList.toggle("hidden", !overridden);
-      }
-
-      function refreshCardVisualsAfterOverride(card) {
-        if (!card) return;
-        if (state.activeModalCard && state.activeModalCard.id === card.id) {
-          state.modalFace = "front";
-          syncModalFaceButtons();
-          attachImageWithFallbacks(dom.modalCardImg, card);
-          syncOverridePanelUI(card);
-        }
-
-        const keepCount = Math.max(state.renderedCount, LAZY_BATCH_SIZE);
-        dom.cardsGrid.innerHTML = "";
-        state.renderedCount = 0;
-        const targetEnd = Math.min(keepCount, state.filteredCards.length);
-        const fragment = document.createDocumentFragment();
-        for (let i = 0; i < targetEnd; i += 1) {
-          fragment.appendChild(createCardElement(state.filteredCards[i]));
-        }
-        dom.cardsGrid.appendChild(fragment);
-        state.renderedCount = targetEnd;
-        updateLazyFooterStatus();
       }
 
       /**
        * 產生本地內嵌 SVG 卡面備援圖（當外部圖片無法載入時使用）
        */
       function buildSpecialCardFallbackDataUri(card) {
-        const bundled = getSpecialUploadedPng(card.part, card.number);
-        if (bundled) return bundled;
-
-        const partLabel = escapeXml(formatPartLabel(card.part || "special"));
-        const numLabel = escapeXml(`#${card.number || ""}`);
-        const titleLabel = escapeXml((card.titleJp || card.displayTitle || "").slice(0, 18));
-        const subLabel = escapeXml((card.titleEn || "VISUAL ADVENTURE").slice(0, 26));
-        const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0b294e"/><stop offset="50%" stop-color="#133d6e"/><stop offset="100%" stop-color="#06162b"/></linearGradient><linearGradient id="gold" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#fde047"/><stop offset="50%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#ea580c"/></linearGradient></defs><rect width="400" height="600" rx="24" fill="url(#bg)"/><rect x="14" y="14" width="372" height="572" rx="18" fill="none" stroke="url(#gold)" stroke-width="4"/><rect x="34" y="38" width="332" height="330" rx="14" fill="#061324" stroke="#fbbf24" stroke-opacity="0.45" stroke-width="2"/><text x="200" y="92" text-anchor="middle" fill="#fde047" font-family="sans-serif" font-size="22" font-weight="900">${partLabel} ${numLabel}</text><text x="200" y="185" text-anchor="middle" fill="#ffffff" font-family="sans-serif" font-size="21" font-weight="800">${titleLabel}</text><text x="200" y="222" text-anchor="middle" fill="#93c5fd" font-family="sans-serif" font-size="14" font-weight="600">${subLabel}</text><text x="200" y="438" text-anchor="middle" fill="#f8fafc" font-family="sans-serif" font-size="16" font-weight="800" letter-spacing="1.5">VISUAL ADVENTURE SPECIAL</text><text x="200" y="492" text-anchor="middle" fill="url(#gold)" font-family="sans-serif" font-size="40" font-weight="900">DRAGON BALL</text><text x="200" y="534" text-anchor="middle" fill="#fde68a" font-family="sans-serif" font-size="18" font-weight="700">ドラゴンボール</text></svg>`;
-        return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+        const keyMatch = String(card && card.number || "").trim().match(/^(?:0*)?(38|39|40|41|42)$/i);
+        if (card && String(card.part || "").trim().toLowerCase() === "special" && keyMatch && BUNDLED_UPLOADED_IMAGES[keyMatch[1]]) {
+          return BUNDLED_UPLOADED_IMAGES[keyMatch[1]];
+        }
+        return buildBundledSpecialArtworkDataUri(
+          (card && card.number) || "000",
+          (card && card.displayTitle) || "DRAGON BALL",
+          (card && card.partLabel) || "VISUAL ADVENTURE",
+          "#102a43",
+          "#facc15"
+        );
       }
 
-      function escapeXml(str) {
-        return String(str || "")
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&apos;");
-      }
-
+      /**
+       * 將 API 回傳的圖片路徑或外部連結解析為可用 URL
+       */
       function resolveAssetUrl(rawUrl) {
-        if (!rawUrl || typeof rawUrl !== "string") return "";
-        const trimmed = rawUrl.trim();
+        const trimmed = String(rawUrl || "").trim();
         if (!trimmed) return "";
-        if (/^(https?:|data:|blob:|\.?\/)/i.test(trimmed)) {
+        if (/^(https?:\/\/|data:|blob:)/i.test(trimmed)) {
           return trimmed;
         }
         return `${API_BASE_URL}/${trimmed.replace(/^\/+/, "")}`;
@@ -1247,14 +1110,6 @@
           artBox.appendChild(promoBadge);
         }
 
-        if (hasAnyOverride(card)) {
-          const ovBadge = document.createElement("span");
-          ovBadge.textContent = "CUSTOM";
-          ovBadge.className =
-            "absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-emerald-500/90 text-slate-950 text-[10px] font-black shadow";
-          artBox.appendChild(ovBadge);
-        }
-
         // 底部編號與標題資訊區
         const metaBox = document.createElement("div");
         metaBox.className = "p-3 flex-1 flex flex-col justify-between gap-1.5 cursor-pointer";
@@ -1498,22 +1353,9 @@
         dom.modalCardYear.textContent = String(card.year);
 
         syncModalFavoriteButton(card);
-        syncOverridePanelUI(card);
 
-        if (dom.overrideImagePanel) {
-          dom.overrideImagePanel.classList.add("hidden");
-        }
-        if (dom.overrideFeedbackMsg) {
-          dom.overrideFeedbackMsg.classList.add("hidden");
-        }
         if (dom.copyToastMsg) {
           dom.copyToastMsg.classList.add("hidden");
-        }
-        if (dom.overrideFileNameText) {
-          dom.overrideFileNameText.textContent = "尚未選擇檔案";
-        }
-        if (dom.overrideFileInput) {
-          dom.overrideFileInput.value = "";
         }
 
         dom.cardModal.classList.remove("hidden");
@@ -1698,77 +1540,6 @@
             }
           });
         }
-
-        // 密碼保護圖片覆寫面板
-        if (dom.toggleOverridePanelBtn) {
-          dom.toggleOverridePanelBtn.addEventListener("click", () => {
-            if (!dom.overrideImagePanel) return;
-            dom.overrideImagePanel.classList.toggle("hidden");
-            if (!dom.overrideImagePanel.classList.contains("hidden") && dom.overridePasswordInput) {
-              dom.overridePasswordInput.focus();
-            }
-          });
-        }
-
-        if (dom.overrideFileInput) {
-          dom.overrideFileInput.addEventListener("change", (e) => {
-            const file = e.target.files && e.target.files[0];
-            if (!file) return;
-            if (!state.activeModalCard) return;
-
-            const enteredPwd = dom.overridePasswordInput ? dom.overridePasswordInput.value : "";
-            if (enteredPwd !== OVERRIDE_PASSWORD) {
-              setOverrideFeedback("密碼錯誤，無法上傳覆寫圖片。", true);
-              e.target.value = "";
-              return;
-            }
-
-            if (file.size > 2.5 * 1024 * 1024) {
-              setOverrideFeedback("圖片檔案過大（請選擇 2.5 MB 以下的圖片）。", true);
-              e.target.value = "";
-              return;
-            }
-
-            dom.overrideFileNameText.textContent = file.name;
-            const reader = new FileReader();
-            reader.onload = () => {
-              const dataUrl = typeof reader.result === "string" ? reader.result : "";
-              if (!dataUrl || !state.activeModalCard) return;
-
-              const cardId = state.activeModalCard.id;
-              const prevEntry = state.imageOverrides[cardId] || {};
-              state.imageOverrides[cardId] = {
-                ...prevEntry,
-                front: dataUrl
-              };
-              saveImageOverrides();
-              setOverrideFeedback(`已成功以「${file.name}」覆寫此卡面圖片！`, false);
-              refreshCardVisualsAfterOverride(state.activeModalCard);
-            };
-            reader.onerror = () => {
-              setOverrideFeedback("讀取圖片檔案時發生錯誤，請重新選擇。", true);
-            };
-            reader.readAsDataURL(file);
-          });
-        }
-
-        if (dom.clearOverrideBtn) {
-          dom.clearOverrideBtn.addEventListener("click", () => {
-            if (!state.activeModalCard) return;
-            const enteredPwd = dom.overridePasswordInput ? dom.overridePasswordInput.value : "";
-            if (enteredPwd !== OVERRIDE_PASSWORD) {
-              setOverrideFeedback("密碼錯誤，無法清除自訂圖片。", true);
-              return;
-            }
-            const cardId = state.activeModalCard.id;
-            delete state.imageOverrides[cardId];
-            saveImageOverrides();
-            dom.overrideFileNameText.textContent = "尚未選擇檔案";
-            if (dom.overrideFileInput) dom.overrideFileInput.value = "";
-            setOverrideFeedback("已清除此卡的自訂覆寫圖片並還原預設卡面。", false);
-            refreshCardVisualsAfterOverride(state.activeModalCard);
-          });
-        }
       }
 
       /**
@@ -1796,7 +1567,6 @@
       window.addEventListener("DOMContentLoaded", () => {
         cacheDomElements();
         loadFavorites();
-        loadImageOverrides();
         bindEvents();
         initLazyLoadObserver();
         loadCatalog(false);
